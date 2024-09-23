@@ -3,6 +3,9 @@
         "jsx": "react",
         "baseUrl": "./src",
         "paths": {
+            "@app/*": [
+                "app/*"
+            ],
             "@assets/*": [
                 "assets/*"
             ],
@@ -41,6 +44,9 @@
             ],
             "@db/*": [
                 "db/*"
+            ],
+            "@validations/*": [
+                "validations/*"
             ],
         }
     }
