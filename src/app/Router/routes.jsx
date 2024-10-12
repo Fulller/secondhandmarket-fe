@@ -16,7 +16,7 @@ import FromMeRating from "@pages/rating/FromMeRating";
 import ForMeRating from "@pages/rating/ForMeRating";
 import Setting from "@pages/Setting";
 import Logout from "@pages/auth/Logout";
-import NewProduct from "@pages/product/NewProduct";
+import PostProduct from "@pages/product/PostProduct";
 
 const ROUTE_TYPES = {
   PUBLIC: PublicRoute,
@@ -110,8 +110,8 @@ const routes = [
     title: "Cài đăt tài khoản",
   },
   {
-    path: "/product/new",
-    Page: NewProduct,
+    path: "/product/post",
+    Page: PostProduct,
     Layout: MainLayout,
     type: ROUTE_TYPES.PRIVATE,
     title: "Đăng bán sản phẩm",
