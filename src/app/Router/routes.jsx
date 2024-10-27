@@ -15,6 +15,8 @@ import SellOrder from "@pages/order/SellOrder";
 import FromMeRating from "@pages/rating/FromMeRating";
 import ForMeRating from "@pages/rating/ForMeRating";
 import Setting from "@pages/Setting";
+import ProfileSetting from "@pages/setting/ProfileSetting";
+import ChangePassword from "@pages/setting/ChangePassword";
 import Logout from "@pages/auth/Logout";
 import NewProduct from "@pages/product/NewProduct";
 
@@ -108,6 +110,20 @@ const routes = [
     Layout: MainLayout,
     type: ROUTE_TYPES.PRIVATE,
     title: "Cài đăt tài khoản",
+  },
+  {
+    path: "/setting/profile",
+    Page: ProfileSetting,
+    Layout: MainLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Cập nhật thông tin người dùng",
+  },
+  {
+    path: "/setting/change-password",
+    Page: ChangePassword,
+    Layout: MainLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Thay đổi mật khẩu",
   },
   {
     path: "/product/new",
