@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-
 import MainLayout from "@layouts/MainLayout";
 import AuthLayout from "@layouts/AuthLayout";
 import NotFound from "@pages/NotFound";
@@ -18,7 +17,7 @@ import Setting from "@pages/Setting";
 import ProfileSetting from "@pages/setting/ProfileSetting";
 import ChangePassword from "@pages/setting/ChangePassword";
 import Logout from "@pages/auth/Logout";
-import NewProduct from "@pages/product/NewProduct";
+import PostProduct from "@pages/product/PostProduct";
 
 const ROUTE_TYPES = {
   PUBLIC: PublicRoute,
@@ -126,8 +125,8 @@ const routes = [
     title: "Thay đổi mật khẩu",
   },
   {
-    path: "/product/new",
-    Page: NewProduct,
+    path: "/product/post",
+    Page: PostProduct,
     Layout: MainLayout,
     type: ROUTE_TYPES.PRIVATE,
     title: "Đăng bán sản phẩm",

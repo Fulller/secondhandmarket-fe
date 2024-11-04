@@ -5,6 +5,7 @@ import defaultAvatar from '../../assets/images/default-avatar.png';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import provincesData from '../../assets/json/local.json';
+import profileSettingSchema from "@validations/profileSettingSchema";
 
 const ProfileSetting = () => {
   const [userData, setUserData] = useState({
@@ -29,16 +30,23 @@ const ProfileSetting = () => {
         return;
       }
       const data = result.data || {};
+      const [userResponse, errorResponse1] = await AuthService.getUser(data.id);
+      const user = userResponse || {};
+
+      const [addressResponse, errorResponse2] = await AuthService.getUserAddress(data.id);
+      const address = addressResponse || {};
+
+      
       setUserData({
-        name: data.name || undefined,
-        phone: data.phone || "",
-        avatar: data.avatar || "",
+        name: user.name || undefined,
+        phone: user.phone || "",
+        avatar: user.avatar || "",
         address: {
-          id: data.address?.id || "",
-          province: data.address?.province || "",
-          district: data.address?.district || "",
-          ward: data.address?.ward || "",
-          detail: data.address?.detail || "",
+          id: address.id || "",
+          province: address.province || "",
+          district: address.district || "",
+          ward: address.ward || "",
+          detail: address.detail || "",
         },
       });
     };
@@ -91,29 +99,44 @@ const ProfileSetting = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Xác thực dữ liệu người dùng với Joi
+    const { error } = profileSettingSchema.validate({
+      name: userData.name,
+      phone: userData.phone,
+      address: userData.address,
+    });
+
+    if (error) {
+      toast.error(error.details[0].message); // Hiển thị thông báo lỗi xác thực
+      return;
+    }
+    const updatedUserData = { ...userData };
   
-    const updatedUserData = { ...userData }; 
-  
-    
     const dataToUpdate = {};
     if (updatedUserData.name !== "") dataToUpdate.name = updatedUserData.name;
     if (updatedUserData.phone !== "") dataToUpdate.phone = updatedUserData.phone;
     if (updatedUserData.avatar) dataToUpdate.avatar = updatedUserData.avatar;
   
-    
-    const addressId = updatedUserData.address.id;
+    // Kiểm tra nếu có thông tin địa chỉ trước khi truy cập vào id
+    const addressId = updatedUserData.address?.id;
+    console.log("Existing Address ID:", addressId);
   
-    
-    if (updatedUserData.address.province || updatedUserData.address.district || updatedUserData.address.ward || updatedUserData.address.detail) {
+    // Kiểm tra nếu có thông tin địa chỉ cần cập nhật hoặc tạo mới
+    if (
+      updatedUserData.address &&
+      (updatedUserData.address.province || 
+       updatedUserData.address.district || 
+       updatedUserData.address.ward || 
+       updatedUserData.address.detail)
+    ) {
       if (addressId) {
-        
         const addressToUpdate = {};
         if (updatedUserData.address.province) addressToUpdate.province = updatedUserData.address.province;
         if (updatedUserData.address.district) addressToUpdate.district = updatedUserData.address.district;
         if (updatedUserData.address.ward) addressToUpdate.ward = updatedUserData.address.ward;
         if (updatedUserData.address.detail) addressToUpdate.detail = updatedUserData.address.detail;
   
-        
+        // Cập nhật địa chỉ nếu tồn tại
         if (Object.keys(addressToUpdate).length > 0) {
           const [addressResult, addressError] = await AuthService.updateAddress(addressId, addressToUpdate);
           if (addressError) {
@@ -122,17 +145,44 @@ const ProfileSetting = () => {
           }
         }
       } else {
-        
-        const [addressResult, addressError] = await AuthService.createAddress(updatedUserData.address);
+        // Tạo địa chỉ mới nếu không có
+        const addressToCreate = {
+          province: updatedUserData.address.province,
+          district: updatedUserData.address.district,
+          ward: updatedUserData.address.ward,
+          detail: updatedUserData.address.detail,
+        };
+        console.log("Creating address with data:", addressToCreate);
+  
+        // Tạo địa chỉ mới
+        const [addressResult, addressError] = await AuthService.createAddress(addressToCreate);
         if (addressError) {
           toast.error("Tạo địa chỉ mới thất bại!");
           return;
         }
-        updatedUserData.address.id = addressResult.data.id; 
+        
+        // Kiểm tra nếu đường dẫn `self.href` tồn tại, sau đó trích xuất `id` từ URL
+        if (addressResult && addressResult._links && addressResult._links.self && addressResult._links.self.href) {
+          const addressUrl = addressResult._links.self.href;
+          const newAddressId = addressUrl.split("/").pop();
+          
+          // Gán `id` cho `updatedUserData.address` và thêm vào `dataToUpdate`
+          updatedUserData.address.id = newAddressId; 
+          dataToUpdate.address = updatedUserData.address; // Thêm địa chỉ vào dữ liệu cập nhật người dùng
+  
+          console.log("New Address ID:", updatedUserData.address.id);
+        } else {
+          toast.error("Không tìm thấy ID của địa chỉ!");
+          return;
+        }
       }
+    } else {
+      toast.error("Vui lòng nhập thông tin địa chỉ!");
+      return;
     }
   
-    
+    // Cập nhật thông tin người dùng
+    console.log("Updating user with data:", dataToUpdate); // Kiểm tra thông tin trước khi gửi yêu cầu
     const [result, errorResponse] = await AuthService.updateUserInfo(dataToUpdate);
     if (errorResponse) {
       toast.error("Cập nhật thông tin thất bại!");
@@ -141,6 +191,8 @@ const ProfileSetting = () => {
   
     toast.success("Cập nhật thông tin thành công!");
   };
+  
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 bg-[url('https://res.cloudinary.com/dt2tfpjrm/image/upload/v1730040121/secondhandmarket/60f1d9f1-d292-4a69-b0c1-35e5d047b42e/images/cwlzkl9hokhapuqlst7e.avif')] bg-cover bg-center min-h-screen flex items-center justify-center" >
@@ -196,6 +248,7 @@ const ProfileSetting = () => {
                   <input 
                     type="text" 
                     name="phone" 
+                    value={userData.phone}
                     onChange={handleInputChange} 
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" 
                   />
@@ -223,7 +276,7 @@ const ProfileSetting = () => {
                     onChange={handleInputChange} 
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   >
-                    <option value="">Chọn tỉnh</option>
+                     <option value="">{userData.address.province ? userData.address.province : "Chọn Tỉnh"}</option>
                     {provincesData.map((province) => (
                       <option key={province.id} value={province.name}>{province.name}</option>
                     ))}
@@ -237,7 +290,7 @@ const ProfileSetting = () => {
                     onChange={handleInputChange} 
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   >
-                    <option value="">Chọn huyện</option>
+                     <option value="">{userData.address.district ? userData.address.district: "Chọn Quận" }</option>
                     {userData.address.province && provincesData.find(province => province.name === userData.address.province)?.districts.map(district => (
                       <option key={district.id} value={district.name}>{district.name}</option>
                     ))}
@@ -251,7 +304,7 @@ const ProfileSetting = () => {
                     onChange={handleInputChange} 
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   >
-                    <option value="">Chọn xã</option>
+                     <option value="">{userData.address.ward ? userData.address.ward: "Chọn Huyện"}</option>
                     {userData.address.district && provincesData.find(province => province.name === userData.address.province)?.districts.find(district => district.name === userData.address.district)?.wards.map(ward => (
                       <option key={ward.id} value={ward.name}>{ward.name}</option>
                     ))}
@@ -263,8 +316,10 @@ const ProfileSetting = () => {
                   <input 
                     type="text" 
                     name="address.detail" 
+                    value={userData.address.detail}
                     onChange={handleInputChange} 
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" 
+                    placeholder="Địa chỉ chi tiết"
                   />
                 </div>
                 </>
