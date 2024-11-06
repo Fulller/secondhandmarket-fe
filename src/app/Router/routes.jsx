@@ -17,6 +17,7 @@ import ForMeRating from "@pages/rating/ForMeRating";
 import Setting from "@pages/Setting";
 import Logout from "@pages/auth/Logout";
 import PostProduct from "@pages/product/PostProduct";
+import UpdateProduct from "@pages/product/UpdateProduct";
 
 const ROUTE_TYPES = {
   PUBLIC: PublicRoute,
@@ -24,6 +25,13 @@ const ROUTE_TYPES = {
 };
 
 const routes = [
+  {
+    path: "/products/post",
+    Page: PostProduct,
+    Layout: MainLayout,
+    type: ROUTE_TYPES.PUBLIC,
+    title: "Đăng sản phẩm",
+  },
   {
     path: "/",
     Page: Home,
@@ -115,6 +123,13 @@ const routes = [
     Layout: MainLayout,
     type: ROUTE_TYPES.PRIVATE,
     title: "Đăng bán sản phẩm",
+  },
+  {
+    path: "/product/update/:id",
+    Page: UpdateProduct,
+    Layout: MainLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Chỉnh sửa sản phẩm",
   },
   {
     path: "/404",

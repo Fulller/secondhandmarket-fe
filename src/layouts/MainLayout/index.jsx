@@ -75,7 +75,7 @@ const MainLayout = ({ children }) => {
           </div>
           <ToolTip content="Đăng sản phẩm">
             <Link
-              to="/product/new"
+              to="/product/post"
               className="postProduct flex items-center bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 whitespace-nowrap"
             >
               <FaPlusCircle />

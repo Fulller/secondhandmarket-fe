@@ -27,10 +27,8 @@ const Form = ({ children, schema, onSubmit }) => {
       ...errors,
       [name]: "",
     });
-    setData({
-      ...data,
-      [name]: value,
-    });
+    data[name] = value;
+    setData(data);
   };
 
   const handleSubmit = async (e) => {
@@ -38,7 +36,7 @@ const Form = ({ children, schema, onSubmit }) => {
     setLoading(true);
     const validationErrors = validate();
     setErrors(validationErrors || {});
-
+    console.log({ dataForm: data });
     if (!validationErrors) {
       await Promise.all([
         onSubmit(data),
@@ -47,6 +45,8 @@ const Form = ({ children, schema, onSubmit }) => {
     }
     setLoading(false);
   };
+
+  console.log({ loading });
 
   return (
     <FormContext.Provider value={{ data, errors, handleChange, loading }}>
