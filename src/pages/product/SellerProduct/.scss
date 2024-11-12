@@ -1,0 +1,15 @@
+#seller-product-page {
+    display         : flex;
+    padding         : 16px;
+    border-radius   : 8px;
+    gap             : 16px;
+    background-color: white;
+
+    #seller-product-page-left {
+        flex-grow: 1;
+    }
+
+    #seller-product-page-right {
+        flex-grow: 2;
+    }
+}

@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
 import MainLayout from "@layouts/MainLayout";
-import AccessDeniedPage from "@pages/AccessDeniedPage";
+import AccessDeniedPage from "@pages/auth/AccessDeniedPage";
 import Title from "@components/Title";
 
 function PrivateRoute({ ...prop }) {

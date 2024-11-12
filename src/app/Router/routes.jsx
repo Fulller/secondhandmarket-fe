@@ -4,19 +4,35 @@ import PrivateRoute from "./PrivateRoute";
 
 import MainLayout from "@layouts/MainLayout";
 import AuthLayout from "@layouts/AuthLayout";
-import NotFound from "@pages/NotFound";
+import AccountLayout from "@layouts/AccountLayout";
+
+// Auth
+import NotFound from "@pages/auth/NotFound";
 import Home from "@pages/Home";
 import Login from "@pages/auth/Login";
 import Register from "@pages/auth/Register";
 import ReceiveTokens from "@pages/auth/ReceiveTokens";
 import ForgotPassword from "@pages/auth/ForgotPassword";
+import Logout from "@pages/auth/Logout";
+// User
+import UserProfile from "@pages/user/Profile";
+import UserAddress from "@pages/user/Address";
+import UserChangePassword from "@pages/user/ChangePassword";
+// Product
+import ProductAll from "@pages/product/All";
+import SellerProduct from "@pages/product/SellerProduct";
+import ProductDetail from "@pages/product/Detail";
+// Purchase request
+import PurchaseRequestMy from "@pages/purchaseRequest/My";
+import PurchaseRequestToMe from "@pages/purchaseRequest/ToMe";
+// Order
 import BuyOrder from "@pages/order/BuyOrder";
 import SellOrder from "@pages/order/SellOrder";
-import FromMeRating from "@pages/rating/FromMeRating";
-import ForMeRating from "@pages/rating/ForMeRating";
-import Setting from "@pages/Setting";
-import Logout from "@pages/auth/Logout";
-import PostProduct from "@pages/product/PostProduct";
+// Review
+import ReviewForMe from "@pages/review/ForMe";
+import ReviewFromMe from "@pages/review/FromMe";
+// Seller
+import Seller from "@pages/Seller";
 
 const ROUTE_TYPES = {
   PUBLIC: PublicRoute,
@@ -24,6 +40,7 @@ const ROUTE_TYPES = {
 };
 
 const routes = [
+  // Auth
   {
     path: "/",
     Page: Home,
@@ -73,49 +90,111 @@ const routes = [
     type: ROUTE_TYPES.PUBLIC,
     title: "Lấy lại mật khẩu",
   },
-
+  // User
+  {
+    path: "/user/profile",
+    Page: UserProfile,
+    Layout: AccountLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Tài khoản / Thông tin",
+  },
+  {
+    path: "/user/address",
+    Page: UserAddress,
+    Layout: AccountLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Tài khoản / Địa chỉ ",
+  },
+  {
+    path: "/user/change-password",
+    Page: UserChangePassword,
+    Layout: AccountLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Tài khoản / Đổi mật khẩu ",
+  },
+  // Product
+  {
+    path: "/product/all",
+    Page: ProductAll,
+    Layout: AccountLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Sản phẩm / Tất cả",
+  },
+  {
+    path: "/product/post",
+    Page: SellerProduct,
+    Layout: AccountLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Sản phẩm / Đăng mới",
+  },
+  {
+    path: "/product/edit/:id",
+    Page: SellerProduct,
+    Layout: MainLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Sản phẩm / Chỉnh sửa",
+  },
+  {
+    path: "/product/:idOrSlug",
+    Page: ProductDetail,
+    Layout: MainLayout,
+    type: ROUTE_TYPES.PUBLIC,
+    title: "Sẩn phẩm / Chi tiết",
+  },
+  // Purchase request
+  {
+    path: "/purchase-request/my",
+    Page: PurchaseRequestMy,
+    Layout: AccountLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Yêu cầu mua / Của tôi",
+  },
+  {
+    path: "/purchase-request/to-me",
+    Page: PurchaseRequestToMe,
+    Layout: AccountLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Yêu cầu mua / Đến tôi",
+  },
+  // Order
   {
     path: "/order/buy",
     Page: BuyOrder,
-    Layout: MainLayout,
+    Layout: AccountLayout,
     type: ROUTE_TYPES.PRIVATE,
-    title: "Đơn hàng mua",
+    title: "Đơn hàng / Mua",
   },
   {
     path: "/order/sell",
     Page: SellOrder,
-    Layout: MainLayout,
+    Layout: AccountLayout,
     type: ROUTE_TYPES.PRIVATE,
-    title: "Đơn hàng bán",
+    title: "Đơn hàng / Bán",
+  },
+  // Review
+  {
+    path: "/review/for-me",
+    Page: ReviewForMe,
+    Layout: AccountLayout,
+    type: ROUTE_TYPES.PRIVATE,
+    title: "Đánh giá / Cho tôi",
   },
   {
-    path: "/rating/from-me",
-    Page: FromMeRating,
-    Layout: MainLayout,
+    path: "/review/from-me",
+    Page: ReviewFromMe,
+    Layout: AccountLayout,
     type: ROUTE_TYPES.PRIVATE,
-    title: "Đánh giá từ tôi",
+    title: "Đánh giá / Từ tôi",
   },
+  // Seller
   {
-    path: "/rating/for-me",
-    Page: ForMeRating,
+    path: "/seller/:id",
+    Page: Seller,
     Layout: MainLayout,
-    type: ROUTE_TYPES.PRIVATE,
-    title: "Đánh giá cho tôi",
+    type: ROUTE_TYPES.PUBLIC,
+    title: "Người bán",
   },
-  {
-    path: "/setting",
-    Page: Setting,
-    Layout: MainLayout,
-    type: ROUTE_TYPES.PRIVATE,
-    title: "Cài đăt tài khoản",
-  },
-  {
-    path: "/product/post",
-    Page: PostProduct,
-    Layout: MainLayout,
-    type: ROUTE_TYPES.PRIVATE,
-    title: "Đăng bán sản phẩm",
-  },
+  //
   {
     path: "/404",
     Page: NotFound,
