@@ -31,6 +31,9 @@ import ReviewForMe from "@pages/review/ForMe";
 import ReviewFromMe from "@pages/review/FromMe";
 // Seller
 import Seller from "@pages/Seller";
+//search
+import SearchResultsPage from "@pages/product/Search/SearchResultsPage";
+
 
 const ROUTE_TYPES = {
   PUBLIC: PublicRoute,
@@ -131,6 +134,13 @@ const routes = [
     Layout: MainLayout,
     type: ROUTE_TYPES.PUBLIC,
     title: "Sẩn phẩm / Chi tiết",
+  },
+  {
+    path: "/search",
+    Page: SearchResultsPage,
+    Layout: MainLayout,
+    type: ROUTE_TYPES.PUBLIC,
+    title: "Kết quả tìm kiếm",
   },
   // Purchase request
   {
