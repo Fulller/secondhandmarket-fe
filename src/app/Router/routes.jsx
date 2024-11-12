@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
-
 import MainLayout from "@layouts/MainLayout";
 import AuthLayout from "@layouts/AuthLayout";
 import AccountLayout from "@layouts/AccountLayout";
@@ -16,7 +15,6 @@ import ForgotPassword from "@pages/auth/ForgotPassword";
 import Logout from "@pages/auth/Logout";
 // User
 import UserProfile from "@pages/user/Profile";
-import UserAddress from "@pages/user/Address";
 import UserChangePassword from "@pages/user/ChangePassword";
 // Product
 import ProductAll from "@pages/product/All";
@@ -97,13 +95,6 @@ const routes = [
     Layout: AccountLayout,
     type: ROUTE_TYPES.PRIVATE,
     title: "Tài khoản / Thông tin",
-  },
-  {
-    path: "/user/address",
-    Page: UserAddress,
-    Layout: AccountLayout,
-    type: ROUTE_TYPES.PRIVATE,
-    title: "Tài khoản / Địa chỉ ",
   },
   {
     path: "/user/change-password",

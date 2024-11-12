@@ -1,234 +1,337 @@
-function Profile() {
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import AuthService from "@services/auth.service";
+import defaultAvatar from '../../assets/images/default-avatar.png';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import provincesData from '../../assets/json/local.json';
+import profileSettingSchema from "@validations/profileSettingSchema";
+
+const ProfileSetting = () => {
+  const [userData, setUserData] = useState({
+    name: "",
+    phone: "",
+    avatar: "",
+    address: {
+      id: "",
+      province: "",
+      district: "",
+      ward: "",
+      detail: "",
+    },
+  });
+  const [isEditingInfo, setIsEditingInfo] = useState(false); 
+  const [isEditingAddress, setIsEditingAddress] = useState(false); 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const [result, errorResponse] = await AuthService.getUserInfo();
+      if (errorResponse) {
+        toast.error("Không thể lấy thông tin người dùng.");
+        return;
+      }
+      const data = result.data || {};
+      const [userResponse, errorResponse1] = await AuthService.getUser(data.id);
+      const user = userResponse || {};
+
+      const [addressResponse, errorResponse2] = await AuthService.getUserAddress(data.id);
+      const address = addressResponse || {};
+
+      
+      setUserData({
+        name: user.name || undefined,
+        phone: user.phone || "",
+        avatar: user.avatar || "",
+        address: {
+          id: address.id || "",
+          province: address.province || "",
+          district: address.district || "",
+          ward: address.ward || "",
+          detail: address.detail || "",
+        },
+      });
+    };
+    fetchUserData();
+  }, []);
+
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files[0];
+  
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file); 
+  
+      try {
+        const response = await AuthService.uploadImage(formData); 
+        console.log("Response from upload:", response); 
+  
+       
+        const imageUrl = response.data.data; 
+        console.log("Image URL:", imageUrl); 
+  
+        setUserData((prev) => ({
+          ...prev,
+          avatar: imageUrl, 
+        }));
+      } catch (error) {
+        console.error("Upload failed", error);
+        toast.error("Có lỗi xảy ra khi upload ảnh.");
+      }
+    }
+  };
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name.startsWith("address.")) {
+      setUserData((prevData) => ({
+        ...prevData,
+        address: {
+          ...prevData.address,
+          [name.split('.')[1]]: value
+        }
+      }));
+    } else {
+      setUserData((prevData) => ({
+        ...prevData,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Xác thực dữ liệu người dùng với Joi
+    const { error } = profileSettingSchema.validate({
+      name: userData.name,
+      phone: userData.phone,
+      address: userData.address,
+    });
+
+    if (error) {
+      toast.error(error.details[0].message); // Hiển thị thông báo lỗi xác thực
+      return;
+    }
+    const updatedUserData = { ...userData };
+  
+    const dataToUpdate = {};
+    if (updatedUserData.name !== "") dataToUpdate.name = updatedUserData.name;
+    if (updatedUserData.phone !== "") dataToUpdate.phone = updatedUserData.phone;
+    if (updatedUserData.avatar) dataToUpdate.avatar = updatedUserData.avatar;
+  
+    // Kiểm tra nếu có thông tin địa chỉ trước khi truy cập vào id
+    const addressId = updatedUserData.address?.id;
+    console.log("Existing Address ID:", addressId);
+  
+    // Kiểm tra nếu có thông tin địa chỉ cần cập nhật hoặc tạo mới
+    if (
+      updatedUserData.address &&
+      (updatedUserData.address.province || 
+       updatedUserData.address.district || 
+       updatedUserData.address.ward || 
+       updatedUserData.address.detail)
+    ) {
+      if (addressId) {
+        const addressToUpdate = {};
+        if (updatedUserData.address.province) addressToUpdate.province = updatedUserData.address.province;
+        if (updatedUserData.address.district) addressToUpdate.district = updatedUserData.address.district;
+        if (updatedUserData.address.ward) addressToUpdate.ward = updatedUserData.address.ward;
+        if (updatedUserData.address.detail) addressToUpdate.detail = updatedUserData.address.detail;
+  
+        // Cập nhật địa chỉ nếu tồn tại
+        if (Object.keys(addressToUpdate).length > 0) {
+          const [addressResult, addressError] = await AuthService.updateAddress(addressId, addressToUpdate);
+          if (addressError) {
+            toast.error("Cập nhật địa chỉ thất bại!");
+            return;
+          }
+        }
+      } else {
+        // Tạo địa chỉ mới nếu không có
+        const addressToCreate = {
+          province: updatedUserData.address.province,
+          district: updatedUserData.address.district,
+          ward: updatedUserData.address.ward,
+          detail: updatedUserData.address.detail,
+        };
+        console.log("Creating address with data:", addressToCreate);
+  
+        // Tạo địa chỉ mới
+        const [addressResult, addressError] = await AuthService.createAddress(addressToCreate);
+        if (addressError) {
+          toast.error("Tạo địa chỉ mới thất bại!");
+          return;
+        }
+        
+        // Kiểm tra nếu đường dẫn `self.href` tồn tại, sau đó trích xuất `id` từ URL
+        if (addressResult && addressResult._links && addressResult._links.self && addressResult._links.self.href) {
+          const addressUrl = addressResult._links.self.href;
+          const newAddressId = addressUrl.split("/").pop();
+          
+          // Gán `id` cho `updatedUserData.address` và thêm vào `dataToUpdate`
+          updatedUserData.address.id = newAddressId; 
+          dataToUpdate.address = updatedUserData.address; // Thêm địa chỉ vào dữ liệu cập nhật người dùng
+  
+          console.log("New Address ID:", updatedUserData.address.id);
+        } else {
+          toast.error("Không tìm thấy ID của địa chỉ!");
+          return;
+        }
+      }
+    } else {
+      toast.error("Vui lòng nhập thông tin địa chỉ!");
+      return;
+    }
+  
+    // Cập nhật thông tin người dùng
+    console.log("Updating user with data:", dataToUpdate); // Kiểm tra thông tin trước khi gửi yêu cầu
+    const [result, errorResponse] = await AuthService.updateUserInfo(dataToUpdate);
+    if (errorResponse) {
+      toast.error("Cập nhật thông tin thất bại!");
+      return;
+    }
+  
+    toast.success("Cập nhật thông tin thành công!");
+  };
+  
+
+
   return (
-    <div>
-      2024-11-12T11:20:27.997+07:00 INFO 9868 --- [secondhandmarket] [ main]
-      org.hibernate.Version : HHH000412: Hibernate ORM core version 6.5.2.Final
-      2024-11-12T11:20:28.103+07:00 INFO 9868 --- [secondhandmarket] [ main]
-      o.h.c.internal.RegionFactoryInitiator : HHH000026: Second-level cache
-      disabled 2024-11-12T11:20:28.944+07:00 INFO 9868 --- [secondhandmarket] [
-      main] o.s.o.j.p.SpringPersistenceUnitInfo : No LoadTimeWeaver setup:
-      ignoring JPA class transformer 2024-11-12T11:20:28.994+07:00 INFO 9868 ---
-      [secondhandmarket] [ main] com.zaxxer.hikari.HikariDataSource :
-      HikariPool-1 - Starting... 2024-11-12T11:20:32.407+07:00 INFO 9868 ---
-      [secondhandmarket] [ main] com.zaxxer.hikari.pool.HikariPool :
-      HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7030b74c
-      2024-11-12T11:20:32.411+07:00 INFO 9868 --- [secondhandmarket] [ main]
-      com.zaxxer.hikari.HikariDataSource : HikariPool-1 - Start completed.
-      2024-11-12T11:20:35.054+07:00 INFO 9868 --- [secondhandmarket] [ main]
-      o.h.e.t.j.p.i.JtaPlatformInitiator : HHH000489: No JTA platform available
-      (set 'hibernate.transaction.jta.platform' to enable JTA platform
-      integration) Hibernate: alter table product modify column description
-      varchar(255) not null 2024-11-12T11:20:49.125+07:00 INFO 9868 ---
-      [secondhandmarket] [ main] j.LocalContainerEntityManagerFactoryBean :
-      Initialized JPA EntityManagerFactory for persistence unit 'default'
-      2024-11-12T11:20:50.495+07:00 INFO 9868 --- [secondhandmarket] [ main]
-      o.s.d.j.r.query.QueryEnhancerFactory : Hibernate is in classpath; If
-      applicable, HQL parser will be used. 2024-11-12T11:20:52.868+07:00 WARN
-      9868 --- [secondhandmarket] [ main]
-      JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is
-      enabled by default. Therefore, database queries may be performed during
-      view rendering. Explicitly configure spring.jpa.open-in-view to disable
-      this warning 2024-11-12T11:20:53.159+07:00 INFO 9868 ---
-      [secondhandmarket] [ main] eAuthenticationProviderManagerConfigurer :
-      Global AuthenticationManager configured with AuthenticationProvider bean
-      with name authenticationProvider 2024-11-12T11:20:53.161+07:00 WARN 9868
-      --- [secondhandmarket] [ main] r$InitializeUserDetailsManagerConfigurer :
-      Global AuthenticationManager configured with an AuthenticationProvider
-      bean. UserDetailsService beans will not be used for username/password
-      login. Consider removing the AuthenticationProvider bean. Alternatively,
-      consider using the UserDetailsService in a manually instantiated
-      DaoAuthenticationProvider. 2024-11-12T11:20:56.269+07:00 INFO 9868 ---
-      [secondhandmarket] [ main] o.s.b.w.embedded.tomcat.TomcatWebServer :
-      Tomcat started on port 8080 (http) with context path '/'
-      2024-11-12T11:20:56.316+07:00 INFO 9868 --- [secondhandmarket] [ main]
-      c.s.SecondhandmarketApplication : Started SecondhandmarketApplication in
-      36.754 seconds (process running for 37.948) Hibernate: select u1_0.id from
-      user u1_0 where u1_0.email=? and not(u1_0.is_from_outside) limit ?
-      2024-11-12T11:49:14.459+07:00 INFO 9868 --- [secondhandmarket]
-      [nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/] : Initializing Spring
-      DispatcherServlet 'dispatcherServlet' 2024-11-12T11:49:14.464+07:00 INFO
-      9868 --- [secondhandmarket] [nio-8080-exec-2]
-      o.s.web.servlet.DispatcherServlet : Initializing Servlet
-      'dispatcherServlet' 2024-11-12T11:49:14.586+07:00 INFO 9868 ---
-      [secondhandmarket] [nio-8080-exec-2] o.s.web.servlet.DispatcherServlet :
-      Completed initialization in 121 ms Hibernate: select
-      rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where rt1_0.user_id=?
-      Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where
-      rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id
-      from category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      2024-11-12T13:40:57.916+07:00 WARN 9868 --- [secondhandmarket] [l-1
-      housekeeper] com.zaxxer.hikari.pool.HikariPool : HikariPool-1 - Thread
-      starvation or clock leap detected (housekeeper
-      delta=1h14m23s972ms701µs100ns). 2024-11-12T13:42:51.291+07:00 WARN 9868
-      --- [secondhandmarket] [nio-8080-exec-6] o.a.c.util.SessionIdGeneratorBase
-      : Creation of SecureRandom instance for session ID generation using
-      [SHA1PRNG] took [321] milliseconds. Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating
-      from user u1_0 where u1_0.is_from_outside and u1_0.provider_name=? and
-      u1_0.provider_id=? Hibernate: select r1_0.user_id,r1_0.role from
-      user_roles r1_0 where r1_0.user_id=? Hibernate: select
-      rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where rt1_0.user_id=?
-      Hibernate: update refresh_token set token=? where user_id=? Hibernate:
-      select rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where
-      rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token from
-      refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where rt1_0.user_id=?
-      Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where
-      rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where rt1_0.user_id=?
-      Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where
-      rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id
-      from category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from
-      category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from
-      category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from
-      category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where
-      rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token from
-      refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select rt1_0.user_id,rt1_0.token from refresh_token
-      rt1_0 where rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token
-      from refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id
-      from category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from
-      category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from
-      category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from
-      category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0
-      Hibernate: select c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from
-      category c1_0 Hibernate: select
-      c1_0.id,c1_0.level,c1_0.name,c1_0.parent_id from category c1_0 Hibernate:
-      select rt1_0.user_id,rt1_0.token from refresh_token rt1_0 where
-      rt1_0.user_id=? Hibernate: select rt1_0.user_id,rt1_0.token from
-      refresh_token rt1_0 where rt1_0.user_id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=? Hibernate: select
-      u1_0.id,u1_0.address_id,u1_0.avatar,u1_0.email,u1_0.is_from_outside,u1_0.name,u1_0.password,u1_0.phone,u1_0.provider_id,u1_0.provider_name,u1_0.rating,r1_0.user_id,r1_0.role
-      from user u1_0 left join user_roles r1_0 on u1_0.id=r1_0.user_id where
-      u1_0.id=?
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 bg-[url('https://res.cloudinary.com/dt2tfpjrm/image/upload/v1730040121/secondhandmarket/60f1d9f1-d292-4a69-b0c1-35e5d047b42e/images/cwlzkl9hokhapuqlst7e.avif')] bg-cover bg-center min-h-screen flex items-center justify-center" >
+      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold mb-4 text-center">Chỉnh sửa thông tin cá nhân</h2>
+        
+        <form onSubmit={handleSubmit} >
+          <div className="text-center mb-6">
+            <div className="relative w-32 h-32 mx-auto mb-4">
+              <img 
+                src={userData.avatar || defaultAvatar} 
+                alt="Avatar" 
+                className="w-32 h-32 rounded-full object-cover"
+              />
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleAvatarChange} 
+                className="hidden" 
+                id="avatar-input"
+              />
+              <label htmlFor="avatar-input" className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-2 cursor-pointer">
+                <FontAwesomeIcon icon={faEdit} className="text-white" />
+              </label>
+            </div>
+            <h2 className="text-xl font-semibold">{userData.name}</h2>
+          </div>
+           {/* Thông tin cá nhân */}
+           <div className="mb-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold mb-2">Thông tin cá nhân</h3>
+              <FontAwesomeIcon
+                icon={faEdit}
+                className="cursor-pointer text-blue-500"
+                onClick={() => setIsEditingInfo((prev) => !prev)}
+              />
+            </div>
+            {isEditingInfo && (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Họ tên</label>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    value={userData.name} 
+                    onChange={handleInputChange} 
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" 
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
+                  <input 
+                    type="text" 
+                    name="phone" 
+                    value={userData.phone}
+                    onChange={handleInputChange} 
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" 
+                  />
+                </div>
+                </>
+            )}
+          </div>
+
+          {/* Địa chỉ */}
+          <div className="mb-4">
+            <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold mb-2">Thông tin địa chỉ</h3>
+            <FontAwesomeIcon
+                icon={faEdit}
+                className="cursor-pointer text-blue-500"
+                onClick={() => setIsEditingAddress((prev) => !prev)}
+              />
+            </div>
+            {isEditingAddress && (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Tỉnh</label>
+                  <select 
+                    name="address.province" 
+                    onChange={handleInputChange} 
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  >
+                     <option value="">{userData.address.province ? userData.address.province : "Chọn Tỉnh"}</option>
+                    {provincesData.map((province) => (
+                      <option key={province.id} value={province.name}>{province.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Huyện</label>
+                  <select 
+                    name="address.district" 
+                    onChange={handleInputChange} 
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  >
+                     <option value="">{userData.address.district ? userData.address.district: "Chọn Quận" }</option>
+                    {userData.address.province && provincesData.find(province => province.name === userData.address.province)?.districts.map(district => (
+                      <option key={district.id} value={district.name}>{district.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Xã</label>
+                  <select 
+                    name="address.ward" 
+                    onChange={handleInputChange} 
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  >
+                     <option value="">{userData.address.ward ? userData.address.ward: "Chọn Huyện"}</option>
+                    {userData.address.district && provincesData.find(province => province.name === userData.address.province)?.districts.find(district => district.name === userData.address.district)?.wards.map(ward => (
+                      <option key={ward.id} value={ward.name}>{ward.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Địa chỉ chi tiết</label>
+                  <input 
+                    type="text" 
+                    name="address.detail" 
+                    value={userData.address.detail}
+                    onChange={handleInputChange} 
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" 
+                    placeholder="Địa chỉ chi tiết"
+                  />
+                </div>
+                </>
+            )}
+          </div>
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-md">
+            Cập nhật thông tin
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
+};
 
-export default Profile;
+export default ProfileSetting;

@@ -27,6 +27,7 @@ const useInitialApp = () => {
     if (error) {
       return;
     }
+    console.log({ result });
     dispatch(setUser(result.data));
   };
 

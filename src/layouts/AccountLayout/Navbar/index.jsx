@@ -1,11 +1,12 @@
-import { Layout, Menu } from "antd";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import navItems from "./navItems";
+import { Layout, Menu } from "antd";
+import useNavItems from "./navItems";
 
 const { Sider } = Layout;
 
 export default function Navbar() {
+  const navItems = useNavItems();
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const selectedKey = location.pathname;

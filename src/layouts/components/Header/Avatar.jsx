@@ -5,10 +5,11 @@ import { useState, useRef } from "react";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Rate } from "antd";
-import navItems from "../../AccountLayout/Navbar/navItems";
 import { FiLogOut } from "react-icons/fi";
+import useNavItems from "../../AccountLayout/Navbar/navItems";
 
 export default function Avatar() {
+  const navItems = useNavItems();
   const user = useSelector((state) => state.auth.user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const tippyRef = useRef(null);
