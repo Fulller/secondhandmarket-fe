@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { fetchProductByIdOrSlug, searchProducts } from "../../../services/productService";
 import Avatar from "../../../assets/images/default-avatar.png";
 import Product from "../../../assets/images/default-product.png";
@@ -140,20 +140,29 @@ function ProductDetail() {
             <h3 className="text-lg font-semibold">Địa chỉ:</h3>
             <p>{product.address.detail}, {product.address.ward}, {product.address.district}, {product.address.province}</p>
           </div>
-          <div className="flex items-center gap-4">
-            <img
-              src={product.seller.avatar || Avatar}
-              alt={product.seller.name}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <div>
-              <h3 className="text-lg font-semibold">{product.seller.name}</h3>
-              {product.seller.rating && <p className="text-yellow-500">Rating: {product.seller.rating}</p>}
+          <Link to={`/seller/${product.seller.id}`}>
+            <div className="flex items-center gap-4">
+            
+              <img
+                src={product.seller.avatar || Avatar}
+                alt={product.seller.name}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div>
+                <h3 className="text-lg font-semibold">{product.seller.name}</h3>
+                {product.seller.rating && <p className="text-yellow-500"> Đánh giá: {product.seller.rating}⭐</p>}
+              </div>
+              
             </div>
+          </Link>
+          <div className="mt-14 mb-14">
+            <button className="bg-blue-500 text-white py-2 px-8 rounded-lg text-lg font-semibold shadow-md hover:bg-blue-600 transition duration-300">
+              Yêu cầu mua
+            </button>
           </div>
         </div>
-      </div>
-
+      </div>  
+      
       {/* Bảng thuộc tính sản phẩm */}
       <div className="mt-10">
         <h3 className="text-2xl font-semibold mb-4">Thuộc tính sản phẩm</h3>

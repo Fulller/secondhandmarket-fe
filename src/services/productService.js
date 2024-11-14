@@ -57,4 +57,26 @@ export const fetchProductByIdOrSlug = async (idOrSlug) => {
   return response.data;
 };
 
+// Lấy thông tin người bán
+export const fetchSellerInfo = async (id) => {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/users/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin người bán:", error);
+    throw error;
+  }
+};
 
+// Lấy danh sách sản phẩm của người bán theo trang
+export const fetchProductsBySeller = async (id, page = 0, size = 10) => {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/products/seller/${id}/available`, {
+      params: {page, size },
+    });
+    return response.data.data; 
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách sản phẩm của người bán:", error);
+    throw error;
+  }
+};
