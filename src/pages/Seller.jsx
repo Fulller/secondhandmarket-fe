@@ -1,7 +1,10 @@
 // src/pages/SellerProfile.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { fetchSellerInfo, fetchProductsBySeller } from "../services/productService";
+import {
+  fetchSellerInfo,
+  fetchProductsBySeller,
+} from "../services/productService";
 import Avatar from "../assets/images/default-avatar.png";
 import PlaceholderImage from "../assets/images/default-product.png"; // Ảnh placeholder
 
@@ -70,41 +73,71 @@ function SellerProfile() {
       {/* Thanh điều hướng và ảnh lớn */}
       <div className="bg-white shadow rounded-lg mb-6">
         <div className="flex items-center p-4">
-          <img src={seller.avatar || Avatar} alt={seller.name} className="w-16 h-16 rounded-full mr-4" />
+          <img
+            src={seller.avatar || Avatar}
+            alt={seller.name}
+            className="w-16 h-16 rounded-full mr-4"
+          />
           <div className="flex-1">
             <h1 className="text-2xl font-semibold">{seller.name}</h1>
-            <p className="text-yellow-500 font-semibold">Đánh giá: {seller.rating || "Chưa có đánh giá"} ⭐</p>
-            
+            <p className="text-yellow-500 font-semibold">
+              Đánh giá: {seller.rating || "Chưa có đánh giá"} ⭐
+            </p>
           </div>
-          <button className="bg-orange-500 text-white px-4 py-2 rounded">+ Theo dõi</button>
+          <button className="bg-orange-500 text-white px-4 py-2 rounded">
+            + Theo dõi
+          </button>
         </div>
         <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="p-4 border bg-white shadow rounded-lg">
-                <h2 className="text-xl font-semibold mb-2">Giới thiệu</h2>
-                <div className="mt-2">
-                  <p className="text-gray-500">SĐT: {seller.phone}</p>
-                  <p className="text-gray-500">
-                    Địa chỉ: {`${seller.address.detail}, ${seller.address.ward}, ${seller.address.district}, ${seller.address.province}`}
-                  </p>
-                </div>
-              </div>
-              <div className="p-4 border bg-white shadow rounded-lg">
-                <h2 className="text-xl font-semibold mb-2">Chính sách của cửa hàng</h2>
-                <p>Chưa có chính sách cửa hàng</p>
-              </div>
+          <div className="p-4 border bg-white shadow rounded-lg">
+            <h2 className="text-xl font-semibold mb-2">Giới thiệu</h2>
+            <div className="mt-2">
+              <p className="text-gray-500">SĐT: {seller.phone}</p>
+              {seller?.address && (
+                <p className="text-gray-500">
+                  Địa chỉ:{" "}
+                  {`${seller?.address?.detail}, ${seller?.address?.ward}, ${seller.address.district}, ${seller.address.province}`}
+                </p>
+              )}
             </div>
-        <img src={seller.avatar || PlaceholderImage} alt="Main banner" className="w-full h-64 object-cover" />
+          </div>
+          <div className="p-4 border bg-white shadow rounded-lg">
+            <h2 className="text-xl font-semibold mb-2">
+              Chính sách của cửa hàng
+            </h2>
+            <p>Chưa có chính sách cửa hàng</p>
+          </div>
+        </div>
+        <img
+          src={seller.avatar || PlaceholderImage}
+          alt="Main banner"
+          className="w-full h-64 object-cover"
+        />
         <div className="flex justify-around border-t mt-2">
-          <button onClick={() => setActiveTab("store")} className={`py-2 px-4 ${activeTab === "store" ? "border-orange-500 border-b-2 font-semibold" : ""}`}>
+          <button
+            onClick={() => setActiveTab("store")}
+            className={`py-2 px-4 ${
+              activeTab === "store"
+                ? "border-orange-500 border-b-2 font-semibold"
+                : ""
+            }`}
+          >
             Cửa Hàng
           </button>
-          
-          <button onClick={() => setActiveTab("reviews")} className={`py-2 px-4 ${activeTab === "reviews" ? "border-orange-500 border-b-2 font-semibold" : ""}`}>
+
+          <button
+            onClick={() => setActiveTab("reviews")}
+            className={`py-2 px-4 ${
+              activeTab === "reviews"
+                ? "border-orange-500 border-b-2 font-semibold"
+                : ""
+            }`}
+          >
             Đánh Giá
           </button>
         </div>
       </div>
-    
+
       {/* Nội dung tab */}
       {activeTab === "store" && (
         <div className="bg-white p-4 shadow rounded-lg">
@@ -117,11 +150,22 @@ function SellerProfile() {
                 products.map((product) => (
                   <Link to={`/product/${product.slug}`} key={product.id}>
                     <div className="flex items-center gap-4 p-4 border-b">
-                      <img src={product.thumbnail || PlaceholderImage} alt={product.name} className="w-24 h-24 rounded" />
+                      <img
+                        src={product.thumbnail || PlaceholderImage}
+                        alt={product.name}
+                        className="w-24 h-24 rounded"
+                      />
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold">{product.name}</h3>
-                        <p className="text-red-500 font-bold">{product.price.toLocaleString("vi-VN")} VNĐ</p>
-                        <p className="text-gray-400 text-sm mt-5"> {calculateDaysSincePosted(product.postedAt)} ngày</p>
+                        <h3 className="text-lg font-semibold">
+                          {product.name}
+                        </h3>
+                        <p className="text-red-500 font-bold">
+                          {product.price.toLocaleString("vi-VN")} VNĐ
+                        </p>
+                        <p className="text-gray-400 text-sm mt-5">
+                          {" "}
+                          {calculateDaysSincePosted(product.postedAt)} ngày
+                        </p>
                       </div>
                       <button className="text-red-500">❤️</button>
                     </div>
