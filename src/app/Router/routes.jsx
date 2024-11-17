@@ -121,7 +121,7 @@ const routes = [
   {
     path: "/product/edit/:id",
     Page: SellerProduct,
-    Layout: MainLayout,
+    Layout: AccountLayout,
     type: ROUTE_TYPES.PRIVATE,
     title: "Sản phẩm / Chỉnh sửa",
   },

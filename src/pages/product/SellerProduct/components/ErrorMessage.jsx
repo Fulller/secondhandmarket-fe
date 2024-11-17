@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import useProduct from "../useProduct";
+import useProduct from "../state/useProduct";
 
 function ErrorMessage({ field, className, ...props }) {
   const {
@@ -9,7 +9,7 @@ function ErrorMessage({ field, className, ...props }) {
     return <Fragment />;
   }
   return (
-    <p className={`erorr-message ${className}`} {...props}>
+    <p className={`error-message ${className}`} {...props}>
       {errorMessage}
     </p>
   );

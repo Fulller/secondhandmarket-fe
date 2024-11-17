@@ -2,14 +2,22 @@ import { getApiUrl } from "@tools/url.tool";
 import axios, { service } from "@tools/axios.tool";
 
 const ProductService = {
-  GetProductById(id) {
+  sellerGetProductById(id) {
     return service(axios.get(getApiUrl(`/products/seller/${id}`)));
   },
-  PostProduct(data) {
+  postProduct(data) {
     return service(axios.post(getApiUrl("/products"), data));
   },
-  PutProduct(id, data) {
+  updateProduct(id, data) {
     return service(axios.put(getApiUrl(`/products/seller/${id}`), data));
+  },
+  sellerGetAllProduct() {
+    return service(axios.get(getApiUrl(`/products/seller`)));
+  },
+  changeStatus(id, status) {
+    return service(
+      axios.put(getApiUrl(`/products/seller/${id}/change-status/${status}`))
+    );
   },
 };
 
