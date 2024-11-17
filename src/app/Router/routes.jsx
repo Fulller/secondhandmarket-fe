@@ -185,7 +185,6 @@ const routes = [
     type: ROUTE_TYPES.PUBLIC,
     title: "Người bán",
   },
-  //
   {
     path: "/404",
     Page: NotFound,

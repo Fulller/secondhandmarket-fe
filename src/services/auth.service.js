@@ -63,7 +63,7 @@ const AuthService = {
 
   // Tạo mới địa chỉ
   createAddress(addressData) {
-    return service(axios.post(`http://localhost:8080/addresses`, addressData));
+    return service(axios.post(`/addresses`, addressData));
   },
 
   // Cập nhật địa chỉ
@@ -84,12 +84,12 @@ const AuthService = {
 
   // Lấy thông tin người dùng theo ID
   getUser(userId) {
-    return service(axios.get(`http://localhost:8080/users/${userId}`));
+    return service(axios.get(`/users/${userId}`));
   },
 
   // Lấy địa chỉ người dùng theo ID người dùng
   getUserAddress(userId) {
-    return service(axios.get(`http://localhost:8080/users/${userId}/address`));
+    return service(axios.get(`/users/${userId}/address`));
   },
 };
 
