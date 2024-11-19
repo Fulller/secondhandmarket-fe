@@ -124,7 +124,7 @@ const routes = [
   {
     path: "/product/edit/:id",
     Page: SellerProduct,
-    Layout: MainLayout,
+    Layout: AccountLayout,
     type: ROUTE_TYPES.PRIVATE,
     title: "Sản phẩm / Chỉnh sửa",
   },
@@ -195,7 +195,6 @@ const routes = [
     type: ROUTE_TYPES.PUBLIC,
     title: "Người bán",
   },
-  //
   {
     path: "/404",
     Page: NotFound,

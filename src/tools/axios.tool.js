@@ -6,6 +6,9 @@ import _ from "lodash";
 
 const axiosInstance = axios.create({
   baseURL: env.api_url,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 axiosInstance.interceptors.request.use(
   (config) => {

@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from "react";
 import ProductList from "./product/components/ProductList";
 import Pagination from "./product/components/Pagination";
-import { fetchHomeProducts } from "../services/productService";
 import poster from "../assets/images/poster.png";
 import Footer from "./product/components/Footer";
+import ProductService from "@services/product.service";
+
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -18,7 +19,7 @@ function Home() {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const data = await fetchHomeProducts(currentPage, pageSize);
+        const data = await ProductService.fetchHomeProducts(currentPage, pageSize);
         setProducts(data.content);
         setTotalPages(data.totalPages);
       } catch (error) {

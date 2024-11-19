@@ -1,0 +1,66 @@
+.model-select-selector {
+    width   : 100%;
+    position: relative;
+
+    &.disabled {
+        opacity       : 0.2;
+        pointer-events: none;
+    }
+
+
+
+    .label {
+        position        : absolute;
+        z-index         : 1;
+        padding         : 8px;
+        border-radius   : 4px;
+        top             : -18px;
+        left            : 12px;
+        background-color: white;
+        font-weight     : 600;
+
+        span {
+            color: red;
+        }
+    }
+
+    .model-select-input {
+        width          : 100%;
+        padding        : 16px;
+        justify-content: space-between;
+        align-items    : center;
+        display        : flex;
+        border-radius  : 8px;
+        outline        : 1.5px solid;
+
+        &:hover {
+            outline-style: dashed;
+        }
+
+        .selected-model-placehoder {
+            display    : flex;
+            align-items: center;
+            opacity    : 0.5;
+        }
+
+        .selected-model-select {
+            text-align : start;
+            font-weight: 600;
+        }
+
+        .icon-wrapper {
+            display        : inline-flex;
+            justify-content: center;
+            align-items    : center;
+            height         : auto;
+            width          : auto;
+
+            .react-icons {
+                width : 30px;
+                height: 30px;
+            }
+        }
+
+    }
+
+}

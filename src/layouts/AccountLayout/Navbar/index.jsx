@@ -31,6 +31,7 @@ export default function Navbar() {
       collapsed={collapsed}
       onCollapse={toggleCollapse}
       width={250}
+      className="navbar"
     >
       <Menu mode="inline" selectedKeys={[selectedKey]} items={menuData} />
     </Sider>

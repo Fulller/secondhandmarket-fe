@@ -1,0 +1,58 @@
+.category-modal {
+    .ant-modal-body {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .modal-title {
+        text-align : center;
+        width      : 100%;
+        font-weight: bold;
+    }
+
+    .back-button {
+        position  : absolute;
+        top       : 16px;
+        left      : 16px;
+        color     : #1890ff;
+        background: none;
+        border    : none;
+        padding   : 0;
+        font-size : 16px;
+        cursor    : pointer;
+        box-shadow: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .category-item {
+        font-weight: 500;
+        cursor     : pointer;
+        padding    : 10px;
+
+        &:hover {
+            background-color: #f0f0f0;
+        }
+    }
+
+}
+
+
+.category-selector {
+    width: 100%;
+
+    .category-input {
+        width          : 100%;
+        height         : 50px;
+        justify-content: space-between;
+        align-items    : center;
+
+        span {
+            display    : flex;
+            align-items: center;
+            font-weight: 600;
+        }
+    }
+}

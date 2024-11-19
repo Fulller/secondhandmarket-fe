@@ -14,7 +14,9 @@ function ProductList({ products }) {
       {products.map((product) => (
         <div key={product.id} className="border rounded-lg overflow-hidden shadow-lg">
           <Link to={`/product/${product.slug}`}>
-            <img src={product.thumbnail ? product.thumbnail : Product} alt={product.name} className="w-full h-76 object-cover" />
+          <div className="w-full h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
+            <img src={product.thumbnail ? product.thumbnail : Product} alt={product.name} className="w-full h-full object-cover" />
+          </div>
             <div className="p-4">
               <h3 className="font-semibold text-lg">{product.name}</h3>
               <p className="text-red-500 font-bold">{product.price.toLocaleString()}₫</p>

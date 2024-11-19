@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer } from "react";
 import { initialState, reducer } from "./sellerProductReducer";
+import { message } from "antd";
 
 const ProductContext = createContext(null);
 
@@ -15,7 +16,7 @@ export const ProductProvider = ({ children }) => {
 export default function useProduct() {
   const context = useContext(ProductContext);
   if (!context) {
-    throw new Error("useProduct must be used within a ProductProvider");
+    message.error("ProductProvider error");
   }
   return context;
 }
