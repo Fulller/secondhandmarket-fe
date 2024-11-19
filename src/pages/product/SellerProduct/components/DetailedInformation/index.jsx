@@ -94,7 +94,7 @@ function DetailedInformation() {
                   </>
                 )}
                 allowClear
-                value={productAttributes[attributeIndex]?.value || null}
+                value={productAttributes?.[attributeIndex]?.value || null}
               >
                 {attribute.options.map((option) => (
                   <Select.Option key={option.id} value={option.name}>
