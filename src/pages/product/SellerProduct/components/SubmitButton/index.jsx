@@ -182,7 +182,7 @@ function SubmitButton() {
       ? await handleCreate(executedData)
       : await handleUpdate(executedData);
     if (res) {
-      navigate(`/product/edit/${res.data.id}`);
+      navigate(`/product/all`);
     }
     dispatch({
       type: "LOADING/UPDATE",

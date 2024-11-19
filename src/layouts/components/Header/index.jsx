@@ -77,15 +77,15 @@ function Header({ onHeightChange: handeHeightChange = () => {} }) {
           )}
         </div>
         <Tooltip title="Đăng sản phẩm">
-          <Link
-            to="/product/post"
+          <a
+            href="/product/post"
             className="postProduct flex items-center bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 whitespace-nowrap"
           >
             <FaPlusCircle />
             <span className="ml-2 100px:hidden 500px:hidden 600px:inline 800px:hidden 900px:hidden xl:inline">
               Đăng sản phẩm
             </span>
-          </Link>
+          </a>
         </Tooltip>
         <div className="avatar flex items" content="Avatar">
           {isLoging ? (

@@ -23,7 +23,6 @@ const profileSettingSchema = Joi.object({
     ward: Joi.string().optional(),
   }).required().messages({
     "object.base": "Thông tin địa chỉ không được để trống"
-
   }).unknown()
 }).unknown();
 
