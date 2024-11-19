@@ -1,5 +1,7 @@
+import TabOrderForSeller from "./components/TabOrderForSeller";
+
 function OrderSell() {
-  return <div>OrderSell page</div>;
+  return <TabOrderForSeller />;
 }
 
 export default OrderSell;

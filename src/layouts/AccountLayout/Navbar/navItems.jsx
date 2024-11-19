@@ -79,6 +79,25 @@ const navItems = [
       },
     ],
   },
+  {
+    label: "Đánh giá",
+    key: "review",
+    icon: <MdOutlineAccountCircle />,
+    items: [
+      {
+        icon: <MdOutlineAccountCircle />,
+        label: "Đánh giá từ tôi",
+        key: "/review/from-me",
+        path: "/review/from-me",
+      },
+      {
+        icon: <MdOutlineAccountCircle />,
+        label: "Đánh giá cho tôi",
+        key: "/review/for-me",
+        path: "/review/for-me",
+      },
+    ],
+  },
 ];
 
 function useNavItems() {

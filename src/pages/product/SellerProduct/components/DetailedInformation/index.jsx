@@ -50,7 +50,7 @@ function DetailedInformation() {
             required={attribute.isRequired}
             className="attribute-item"
           >
-            {attribute.options.length > 0 ? (
+            {attribute.options?.length > 0 ? (
               <Select
                 onChange={(value) => handleChange(attribute.id, value)}
                 placeholder={`${attribute.name} ${

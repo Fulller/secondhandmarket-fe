@@ -105,6 +105,7 @@ const ProfileSetting = () => {
       phone: userData.phone,
       address: userData.address,
     });
+    console.log({address: userData.address})
 
     if (error) {
       toast.error(error.details[0].message); // Hiển thị thông báo lỗi xác thực
