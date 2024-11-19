@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom"; 
-import { searchProducts, fetchCategories } from "../../../services/productService";
 import ProductList from "../components/ProductList";
 import Pagination from "../components/Pagination";
 import provincesData from "../../../assets/json/local.json"; 
+import ProductService from "@services/product.service";
+
 
 
 
@@ -22,7 +23,7 @@ function SearchResultsPage() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const categoryData = await fetchCategories();
+        const categoryData = await ProductService.fetchCategories();
         setCategories(categoryData);
       } catch (error) {
         console.error("Không thể tải danh mục:", error);
@@ -35,7 +36,7 @@ function SearchResultsPage() {
     const loadFilteredProducts = async () => {
       setLoading(true);
       try {
-        const data = await searchProducts(query, filters, currentPage, 10);
+        const data = await ProductService.searchProducts(query, filters, currentPage, 10);
         setProducts(data.content || []);
         setTotalPages(data.totalPages || 1);
       } catch (error) {

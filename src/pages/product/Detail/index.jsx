@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchProductByIdOrSlug, searchProducts } from "../../../services/productService";
+import ProductService from "@services/product.service";
 import Avatar from "../../../assets/images/default-avatar.png";
 import Product from "../../../assets/images/default-product.png";
 import ProductList from "../components/ProductList";
@@ -23,7 +23,7 @@ function ProductDetail() {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const response = await fetchProductByIdOrSlug(idOrSlug);
+        const response = await ProductService.fetchProductByIdOrSlug(idOrSlug);
         setProduct(response.data);
   
         if (response.data.category.id) {
@@ -38,7 +38,7 @@ function ProductDetail() {
 
     const loadRelatedProducts = async (categoryId) => {
       try {
-        const relatedResponse = await searchProducts(" ", { categoryId }, relatedPage, 4);
+        const relatedResponse = await ProductService.searchProducts(" ", { categoryId }, relatedPage, 4);
         setRelatedProducts(relatedResponse.content || []);
         setRelatedTotalPages(relatedResponse.totalPages);
       } catch (error) {

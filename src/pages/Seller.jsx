@@ -1,12 +1,10 @@
 // src/pages/SellerProfile.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import {
-  fetchSellerInfo,
-  fetchProductsBySeller,
-} from "../services/productService";
 import Avatar from "../assets/images/default-avatar.png";
 import PlaceholderImage from "../assets/images/default-product.png"; // Ảnh placeholder
+import ProductService from "@services/product.service";
+
 
 function SellerProfile() {
   const { id } = useParams();
@@ -22,7 +20,7 @@ function SellerProfile() {
     const loadSellerInfo = async () => {
       try {
         setLoadingSeller(true);
-        const sellerInfo = await fetchSellerInfo(id);
+        const sellerInfo = await ProductService.fetchSellerInfo(id);
         setSeller(sellerInfo.data);
         loadProducts(0);
       } catch (error) {
@@ -35,7 +33,7 @@ function SellerProfile() {
     const loadProducts = async (page = 0) => {
       try {
         setLoadingProducts(true);
-        const productsResponse = await fetchProductsBySeller(id, page, 4);
+        const productsResponse = await ProductService.fetchProductsBySeller(id, page, 4);
         if (productsResponse) {
           setProducts(productsResponse);
           setTotalPages(productsResponse.totalPages || 1);
