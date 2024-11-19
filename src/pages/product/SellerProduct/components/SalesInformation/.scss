@@ -1,0 +1,37 @@
+#seller-product-sales-information {
+    width: 100%;
+
+    .input-field {
+        width        : 100%;
+        margin-bottom: 16px;
+
+        .input-field-wrap {
+            display        : flex;
+            justify-content: space-between;
+            width          : 100%;
+            gap            : 12px;
+
+
+            label {
+                display        : flex;
+                font-weight    : bold;
+                align-items    : center;
+                justify-content: end;
+                width          : 40%;
+                gap            : 12px;
+
+                .required-icon {
+                    color      : red;
+                    margin-left: 4px;
+                    font-size  : 12px;
+                }
+            }
+
+            .ant-input {
+                border-radius: 4px;
+                font-weight  : 600;
+            }
+        }
+    }
+
+}

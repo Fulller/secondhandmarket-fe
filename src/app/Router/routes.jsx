@@ -31,6 +31,9 @@ import ReviewForMe from "@pages/review/ForMe";
 import ReviewFromMe from "@pages/review/FromMe";
 // Seller
 import Seller from "@pages/Seller";
+//search
+import SearchResultsPage from "@pages/product/Search/SearchResultsPage";
+
 
 const ROUTE_TYPES = {
   PUBLIC: PublicRoute,
@@ -121,7 +124,7 @@ const routes = [
   {
     path: "/product/edit/:id",
     Page: SellerProduct,
-    Layout: MainLayout,
+    Layout: AccountLayout,
     type: ROUTE_TYPES.PRIVATE,
     title: "Sản phẩm / Chỉnh sửa",
   },
@@ -131,6 +134,13 @@ const routes = [
     Layout: MainLayout,
     type: ROUTE_TYPES.PUBLIC,
     title: "Sẩn phẩm / Chi tiết",
+  },
+  {
+    path: "/search",
+    Page: SearchResultsPage,
+    Layout: MainLayout,
+    type: ROUTE_TYPES.PUBLIC,
+    title: "Kết quả tìm kiếm",
   },
   // Purchase request
   {
@@ -185,7 +195,6 @@ const routes = [
     type: ROUTE_TYPES.PUBLIC,
     title: "Người bán",
   },
-  //
   {
     path: "/404",
     Page: NotFound,

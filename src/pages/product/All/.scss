@@ -1,0 +1,21 @@
+.all-product-container {
+    padding         : 20px;
+    background-color: #f9f9f9;
+
+    .ant-tabs-nav {
+        margin-bottom: 20px;
+    }
+
+    .ant-table {
+        background-color: white;
+        padding         : 10px;
+    }
+
+    .ant-table-thead>tr>th {
+        background-color: #f1f1f1;
+    }
+
+    .ant-btn {
+        margin: 5px;
+    }
+}
