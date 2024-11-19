@@ -9,11 +9,11 @@ function createSchema(attributes) {
       "string.min": "Tên sản phẩm phải từ 20 ký tự.",
       "string.max": "Tên sản phẩm quá giới hạn 1000 ký tự",
     }),
-    description: Joi.string().min(100).max(100000).required().messages({
+    description: Joi.string().min(100).max(999).required().messages({
       "string.empty": "Mô tả không được để trống",
       "any.required": "Mô tả là bắt buộc",
       "string.min": "Mô tả phải từ 100 ký tự.",
-      "string.max": "Mô tả quá giới hạn 100000 ký tự",
+      "string.max": "Mô tả quá giới hạn 999 ký tự",
     }),
     price: Joi.number().min(100000).max(1000000000).required().messages({
       "number.base": "Giá phải là một số",
