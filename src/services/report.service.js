@@ -5,5 +5,8 @@ const ReportService = {
   postReport(data) {
     return service(axios.post(getApiUrl("/report/post"), data));
   },
+  getReport(id) {
+    return service(axios.get(getApiUrl(`/report/reviews/${id}`)));
+  },
 };
 export default ReportService;

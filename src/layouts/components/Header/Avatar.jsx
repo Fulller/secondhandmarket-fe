@@ -13,7 +13,7 @@ export default function Avatar() {
   const user = useSelector((state) => state.auth.user);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const tippyRef = useRef(null);
-  const rating = user?.raing || 4.6;
+  const rating = user?.rating || 0;
   const menuItems = [
     ...navItems,
     {

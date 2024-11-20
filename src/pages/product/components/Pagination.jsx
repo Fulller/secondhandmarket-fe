@@ -1,6 +1,3 @@
-// src/components/Pagination.jsx
-import React from "react";
-
 function Pagination({ currentPage, totalPages, onPageChange }) {
   const pages = Array.from({ length: totalPages }, (_, i) => i);
 

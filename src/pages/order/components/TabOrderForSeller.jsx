@@ -34,31 +34,16 @@ const TabOrderForSeller = () => {
   const [reviews, setReview] = useState([]);
   const [currentStatus, setCurrentStatus] = useState("ACCEPTED");
 
-  const [currentUser, setCurrentUser] = useState({
-    id: "",
-    email: "",
-  });
   useEffect(() => {
-    // getUserInfo();
     getOrderSeller(currentStatus);
   }, [currentStatus]);
-  async function getUserInfo() {
-    const [res, err] = await AuthService.getUserInfo();
-    if (err) {
-      message.error("Lấy thông tin user thất bại");
-    } else {
-      setCurrentUser({
-        id: res.data.id || null,
-        email: res.data.email || null,
-      });
-    }
-  }
+
   async function getOrderSeller(statusOrder) {
     setIsLoading(true);
     const [[ordersRes, ordersErr], [reviewsRes, reviewsErr]] =
       await Promise.all([
         OrderService.getOrderSeller(statusOrder),
-        ReviewService.getReviewerReview(),
+        ReviewService.getSellerReview(),
       ]);
     console.log({ ordersErr, reviewsErr });
     if (ordersErr || reviewsErr) {
@@ -77,7 +62,6 @@ const TabOrderForSeller = () => {
       <TableOrder
         orders={orders}
         reviews={reviews}
-        currentUser={currentUser}
         role={"seller"}
         loading={isLoading}
         setOrders={setOrders}

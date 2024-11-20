@@ -7,6 +7,10 @@ import {
 } from "../services/productService";
 import Avatar from "../assets/images/default-avatar.png";
 import PlaceholderImage from "../assets/images/default-product.png"; // Ảnh placeholder
+import ReviewSeller from "@components/ReviewSeller";
+import ReviewService from "@services/review.service";
+import { message } from "antd";
+import ReportSeller from "@components/ReportSeller";
 
 function SellerProfile() {
   const { id } = useParams();
@@ -17,6 +21,9 @@ function SellerProfile() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [activeTab, setActiveTab] = useState("store");
+  const [isReported, setIsReported] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [reportNum, setReportNum] = useState(0);
 
   useEffect(() => {
     const loadSellerInfo = async () => {
@@ -49,10 +56,37 @@ function SellerProfile() {
         setLoadingProducts(false);
       }
     };
-
+    handleGetReview(id);
+    handleCheckIsReported();
     loadSellerInfo();
   }, [id]);
 
+  async function handleGetReview(id) {
+    try {
+      const [res, err] = await ReviewService.getShopReview(id);
+      if (err) {
+        message.error("Không có dữ liệu review");
+      } else {
+        setReviews(res.data);
+        handleCheckIsReported(res.data);
+      }
+    } catch (err) {
+      message.error("Lấy review thất bại");
+      console.error(err);
+    }
+  }
+  const handleSetNum = (data) => {
+    setReportNum(data);
+  };
+
+  const handleCheckIsReported = (reviewsList) => {
+    if (Array.isArray(reviewsList)) {
+      const reportedReview = reviewsList.some((review) => review.isReport);
+      setIsReported(reportedReview);
+    } else {
+      console.error("Dữ liệu review không hợp lệ");
+    }
+  };
   const handlePageChange = (newPage) => {
     setPage(newPage);
     loadProducts(newPage);
@@ -135,6 +169,21 @@ function SellerProfile() {
           >
             Đánh Giá
           </button>
+
+          {isReported ? (
+            <button
+              onClick={() => setActiveTab("reports")}
+              className={`py-2 px-4 ${
+                activeTab === "reports"
+                  ? "border-orange-500 border-b-2 font-semibold"
+                  : ""
+              }`}
+            >
+              Báo cáo
+            </button>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
 
@@ -204,10 +253,28 @@ function SellerProfile() {
         </div>
       )}
 
+      {activeTab === "reports" && (
+        <div className="bg-white p-4 shadow rounded-lg">
+          <div className="flex justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold mb-4">Báo cáo</h2>
+            </div>
+            <div>
+              {reportNum.number != null && reportNum.number >= 0 && (
+                <h2 className="text-2xl font-semibold mb-4">
+                  {reportNum.number}/5
+                </h2>
+              )}
+            </div>
+          </div>
+          <ReportSeller reportNumber={handleSetNum} />
+        </div>
+      )}
+
       {activeTab === "reviews" && (
         <div className="bg-white p-4 shadow rounded-lg">
           <h2 className="text-2xl font-semibold mb-4">Đánh Giá</h2>
-          <p>Phần đánh giá của người bán sẽ hiển thị ở đây.</p>
+          <ReviewSeller />
         </div>
       )}
     </div>

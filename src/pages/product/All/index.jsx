@@ -140,7 +140,7 @@ const AllProduct = () => {
     if (status === "ALL") {
       return products;
     }
-    return products.filter((product) => product.status === status);
+    return products?.filter((product) => product.status === status);
   };
 
   const tabItems = Object.keys(statusMap).map((STATUS) => ({

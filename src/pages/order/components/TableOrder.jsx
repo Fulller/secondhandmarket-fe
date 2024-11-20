@@ -29,7 +29,6 @@ const TableOrder = ({
   const [reviewsMap, setReviewMap] = useState({});
 
   useEffect(() => {
-    // Kiểm tra nếu reviews đã thay đổi so với reviewsMap hiện tại
     const newReviewsMap = reviews.reduce((acc, review) => {
       acc[review.product.id] = review;
       return acc;
@@ -145,7 +144,12 @@ const TableOrder = ({
       key: "actions",
       render: (text, record) => {
         if (record.status === "COMPLETED") {
-          return <ModalPostReview review={reviewsMap[record.product.id]} />;
+          return (
+            <ModalPostReview
+              currentUser={currentUser}
+              review={reviewsMap[record.product.id]}
+            />
+          );
         } else if (record.status === "CANCELED") {
           return (
             <Button type="danger" danger>

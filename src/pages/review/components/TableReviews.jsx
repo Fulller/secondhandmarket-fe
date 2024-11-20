@@ -4,9 +4,12 @@ import { Button, message, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import ModalPostReview from "./ModalPostReview";
 import ModalReportPost from "@pages/report/components/ModalReportPost";
+import { useSelector } from "react-redux";
+import ModalFeedback from "./ModalFeedback";
 
 const TableReviews = ({ reviews, isLoading, status, setReviews }) => {
   const [reviewLoading, setReviewLoading] = useState(false);
+  const currentUserId = useSelector((state) => state.auth.user.id);
 
   async function handleChangeDelete(record) {
     setReviewLoading(true);
@@ -101,10 +104,18 @@ const TableReviews = ({ reviews, isLoading, status, setReviews }) => {
           <ModalPostReview review={record} setReviews={setReviews} />
         ) : record.status === "PUBLIC" ? (
           <>
-            <Button type="primary" onClick={() => handleChangeDelete(record)}>
+            <Button
+              disabled={currentUserId === record.seller.id}
+              type="primary"
+              onClick={() => handleChangeDelete(record)}
+            >
               Ẩn
             </Button>
-            <ModalReportPost review={record} />
+            {currentUserId === record.seller.id ? (
+              <ModalFeedback review={record} />
+            ) : (
+              <ModalReportPost review={record} />
+            )}
           </>
         ) : (
           <Button disabled>Đã ẩn</Button>

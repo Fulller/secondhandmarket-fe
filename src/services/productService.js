@@ -1,17 +1,17 @@
 import axios from "axios";
 
-export const fetchHomeProducts = async (page = 0, size = 8) => {
-  try {
-    const response = await axios.get(`http://localhost:8080/api/products/home`, {
-      params: { page, size },
-      headers: { Accept: "application/hal+json" }
-    });
-    return response.data.data; 
-  } catch (error) {
-    console.error("Lỗi khi lấy danh sách sản phẩm:", error);
-    throw error;
-  }
-};
+// export const fetchHomeProducts = async (page = 0, size = 8) => {
+//   try {
+//     const response = await axios.get(`http://localhost:8080/api/products/home`, {
+//       params: { page, size },
+//       headers: { Accept: "application/hal+json" }
+//     });
+//     return response.data.data; 
+//   } catch (error) {
+//     console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+//     throw error;
+//   }
+// };
 // Lấy danh sách danh mục
 export const fetchCategories = async () => {
   try {

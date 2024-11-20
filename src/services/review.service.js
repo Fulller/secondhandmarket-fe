@@ -17,13 +17,31 @@ const ReviewService = {
   deleteReview(reviewId) {
     return service(axios.put(getApiUrl(`/reviews/${reviewId}/change-status`)));
   },
-
-  getSellerReview(status = "PENDING") {
-    return service(axios.get(getApiUrl(`/reviews/seller?status=${status}`)));
+  getSellerReview(status) {
+    return service(
+      axios.get(
+        getApiUrl(`/reviews/seller${status ? "?status=" + status : ""}`)
+      )
+    );
+  },
+  getShopReview(sellerId, status) {
+    return service(
+      axios.get(
+        getApiUrl(
+          `/reviews/seller/${sellerId}${status ? "?status=" + status : ""}`
+        )
+      )
+    );
   },
 
-  getReviewerReview(status = "PENDING") {
-    return service(axios.get(getApiUrl(`/reviews/reviewer?status=${status}`)));
+  getReviewerReview(status) {
+    if (status == null) {
+      return service(axios.get(getApiUrl(`/reviews/reviewer`)));
+    } else {
+      return service(
+        axios.get(getApiUrl(`/reviews/reviewer?status=${status}`))
+      );
+    }
   },
 
   postFeedback(reviewId, data) {
