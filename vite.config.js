@@ -22,7 +22,11 @@ export default defineConfig({
       "@validations": "/src/validations",
     },
   },
+  build: {
+    outDir: "dist",
+  },
   server: {
+    host: true,
     port: 3000,
   },
   css: {
@@ -31,5 +35,8 @@ export default defineConfig({
         silenceDeprecations: ["legacy-js-api"],
       },
     },
+  },
+  define: {
+    "process.env": process.env,
   },
 });

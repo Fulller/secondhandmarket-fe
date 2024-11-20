@@ -56,6 +56,7 @@ const AllProduct = () => {
 
   async function fetchProducts() {
     const [res, err] = await ProductService.sellerGetAllProduct();
+    console.log({ res, err });
     if (err) {
       message.error("Lấy sản phẩm thất bại");
     } else {
