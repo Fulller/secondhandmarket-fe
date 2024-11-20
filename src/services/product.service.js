@@ -19,6 +19,25 @@ const ProductService = {
       axios.put(getApiUrl(`/products/seller/${id}/change-status/${status}`))
     );
   },
+  fetchHomeProducts(page = 0, size = 8) {
+    return service(
+      axios.get(getApiUrl(`/products/home?page=${page}&size=${size}`))
+    );
+  },
+  searchProducts(query, filters = {}, page = 0, size = 10) {
+    const params = {
+      ...(query && { q: query.trim() }), // Thêm tham số 'q' nếu query có giá trị
+      page,
+      size,
+      ...Object.fromEntries(
+        Object.entries(filters).filter(
+          ([_, value]) => value != null && value !== "" // Chỉ thêm các trường có giá trị hợp lệ
+        )
+      ),
+    };
+    // Sửa: Truyền params vào trong config của axios
+    return service(axios.get(getApiUrl(`/products/search`), { params }));
+  },
 };
 
 export default ProductService;

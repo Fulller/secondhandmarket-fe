@@ -8,6 +8,7 @@ import Avatar from "../../../assets/images/default-avatar.png";
 import Product from "../../../assets/images/default-product.png";
 import ProductList from "../components/ProductList";
 import ModalRequestPurchase from "./components/ModalRequestPurchase";
+import useAddress from "@hooks/useAddress";
 
 function ProductDetail() {
   const { idOrSlug } = useParams();
@@ -24,6 +25,8 @@ function ProductDetail() {
 
   const [relatedPage, setRelatedPage] = useState(0);
   const [relatedTotalPages, setRelatedTotalPages] = useState(1);
+
+  const getAddress = useAddress();
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -175,10 +178,11 @@ function ProductDetail() {
           </p>
           <div className="mb-4">
             <h3 className="text-lg font-semibold">Địa chỉ:</h3>
-            <p>
+            {/* <p>
               {product.address.detail}, {product.address.ward},{" "}
               {product.address.district}, {product.address.province}
-            </p>
+            </p> */}
+            {getAddress.full(product.address)}
           </div>
           <Link to={`/seller/${product.seller.id}`}>
             <div className="flex items-center gap-4">
@@ -199,7 +203,7 @@ function ProductDetail() {
             </div>
           </Link>
           <div className="mt-14 mb-14">
-            <ModalRequestPurchase product={product}/>
+            <ModalRequestPurchase product={product} />
           </div>
         </div>
       </div>

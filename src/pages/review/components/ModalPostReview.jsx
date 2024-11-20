@@ -30,7 +30,7 @@ const ModalPostReview = ({ review, setReviews }) => {
       buttonLabel = "Rated";
       isDisabled = true;
     }
-  } else if (!isReviewer) {
+  } else  {
     if (isPending) {
       buttonLabel = "null";
       isDisabled = true;
@@ -143,7 +143,7 @@ const ModalPostReview = ({ review, setReviews }) => {
         <ModalFeedback review={review} />
       ) : buttonLabel === "Review" ? (
         <Button type="primary" onClick={showModal} disabled={isDisabled}>
-          <TfiCommentsSmiley />
+          <TfiCommentsSmiley /> Review
         </Button>
       ) : (
         <Button disabled={true}>{buttonLabel}</Button>

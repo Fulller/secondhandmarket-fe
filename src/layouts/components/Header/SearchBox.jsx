@@ -1,12 +1,12 @@
 // src/components/SearchBox.jsx
 import React, { useState, useRef } from "react";
 import { FaSearch, FaTimes } from "react-icons/fa";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 export default function SearchBox({ className }) {
   const [searchTerm, setSearchTerm] = useState("");
   const inputRef = useRef(null);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -18,12 +18,18 @@ export default function SearchBox({ className }) {
     setSearchTerm("");
     inputRef.current.focus();
   };
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   return (
     <div className={className + " flex-1 flex items-center mx-8"}>
       <div className="flex items-center w-full bg-gray-100 rounded-md p-1 pl-4">
         <input
           type="text"
+          onKeyDown={handleKeyDown}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-1 bg-transparent focus:outline-none py-1"
@@ -35,7 +41,10 @@ export default function SearchBox({ className }) {
             <FaTimes />
           </button>
         )}
-        <button onClick={handleSearch} className="bg-blue-500 text-white p-2 px-4 rounded-md hover:bg-blue-600">
+        <button
+          onClick={handleSearch}
+          className="bg-blue-500 text-white p-2 px-4 rounded-md hover:bg-blue-600"
+        >
           <FaSearch />
         </button>
       </div>
