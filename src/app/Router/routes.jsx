@@ -34,7 +34,6 @@ import Seller from "@pages/Seller";
 //search
 import SearchResultsPage from "@pages/product/Search/SearchResultsPage";
 
-
 const ROUTE_TYPES = {
   PUBLIC: PublicRoute,
   PRIVATE: PrivateRoute,

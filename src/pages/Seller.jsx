@@ -11,6 +11,7 @@ import ReviewSeller from "@components/ReviewSeller";
 import ReviewService from "@services/review.service";
 import { message } from "antd";
 import ReportSeller from "@components/ReportSeller";
+import useAddress from "@hooks/useAddress";
 
 function SellerProfile() {
   const { id } = useParams();
@@ -24,6 +25,7 @@ function SellerProfile() {
   const [isReported, setIsReported] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [reportNum, setReportNum] = useState(0);
+  const address = useAddress();
 
   useEffect(() => {
     const loadSellerInfo = async () => {
@@ -129,8 +131,7 @@ function SellerProfile() {
               <p className="text-gray-500">SĐT: {seller.phone}</p>
               {seller?.address && (
                 <p className="text-gray-500">
-                  Địa chỉ:{" "}
-                  {`${seller?.address?.detail}, ${seller?.address?.ward}, ${seller.address.district}, ${seller.address.province}`}
+                  Địa chỉ: {address.full(seller?.address)}
                 </p>
               )}
             </div>

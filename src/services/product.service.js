@@ -19,9 +19,9 @@ const ProductService = {
       axios.put(getApiUrl(`/products/seller/${id}/change-status/${status}`))
     );
   },
-  fetchHomeProducts(page = 0, size = 8) {
+  fetchHomeProducts(page = 1, size = 8) {
     return service(
-      axios.get(getApiUrl(`/products/home?page=${page}&size=${size}`))
+      axios.get(getApiUrl(`/products/home?page=${page - 1}&size=${size}`))
     );
   },
   searchProducts(query, filters = {}, page = 0, size = 10) {

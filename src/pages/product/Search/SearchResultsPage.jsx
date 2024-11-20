@@ -1,44 +1,48 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { fetchCategories } from "../../../services/productService";
-import ProductList from "../components/ProductList";
-import Pagination from "../components/Pagination";
-import provincesData from "../../../assets/json/address.json";
-import ProductService from "@services/product.service";
-import { message } from "antd";
+import { TreeSelect, Slider, Button, message, Pagination, Select } from "antd";
+import debounce from "lodash/debounce";
+import ProductList from "../../Home/ProductList";
+import provincesData from "@assets/json/address.json";
 import CategoryService from "@services/category.service";
-import { debounce } from "lodash";
+import ProductService from "@services/product.service";
 
 function SearchResultsPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     categoryId: searchParams.get("categoryId") || "",
     province: searchParams.get("province") || "",
-    minPrice: searchParams.get("minPrice") || 0,
-    maxPrice: searchParams.get("maxPrice") || 1000000,
+    minPrice: parseInt(searchParams.get("minPrice") || 0, 10),
+    maxPrice: parseInt(searchParams.get("maxPrice") || 1000000, 10),
   });
+
   const query = searchParams.get("q") || "";
-  const [currentPage, setCurrentPage] = useState(searchParams.get("page") || 0);
-  const [totalPages, setTotalPages] = useState(searchParams.get("size") || 10);
+  const [currentPage, setCurrentPage] = useState(
+    parseInt(searchParams.get("page") || 0, 10)
+  );
+  const [totalPages, setTotalPages] = useState(1);
 
-  const navigate = useNavigate();
-
-  // Load categories on component mount
+  // Load danh mục khi khởi tạo
   useEffect(() => {
-    const loadCategories = async () => {
+    const fetchCategories = async () => {
       const [res, err] = await CategoryService.getTree();
-      if (err) return;
-      setCategories(res.data);
+      if (err) {
+        message.error("Không thể tải danh mục!");
+      } else {
+        setCategories(res.data);
+      }
     };
-    loadCategories();
+    fetchCategories();
   }, []);
 
-  // Load products based on filters and search query
+  // Load sản phẩm khi có thay đổi filters hoặc query
   useEffect(() => {
-    const loadProducts = async () => {
+    const fetchProducts = async () => {
       setLoading(true);
       const [res, err] = await ProductService.searchProducts(
         query,
@@ -49,116 +53,126 @@ function SearchResultsPage() {
       setLoading(false);
       if (err) {
         message.error("Không tìm thấy sản phẩm!");
+        setProducts([]);
       } else {
-        message.success("Tìm kiếm thành công!");
         setProducts(res.data.content);
         setTotalPages(res.data.totalPages);
       }
     };
-    loadProducts();
+    fetchProducts();
   }, [query, filters, currentPage]);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleFilterChange = (name, value) => {
+    const updatedFilters = { ...filters, [name]: value };
+    setFilters(updatedFilters);
 
-    const updatedSearchParams = new URLSearchParams(window.location.search);
+    const updatedSearchParams = new URLSearchParams(searchParams);
     if (value) {
       updatedSearchParams.set(name, value);
     } else {
       updatedSearchParams.delete(name);
     }
+
+    setCurrentPage(0); // Reset page về 0
+    updatedSearchParams.set("page", 0);
     navigate(`/search?${updatedSearchParams.toString()}`);
-    setCurrentPage(0);
   };
 
-  const handlePriceChange = debounce((e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: Number(value),
+  const handlePriceChange = debounce(([minPrice, maxPrice]) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      minPrice,
+      maxPrice,
     }));
+
+    const updatedSearchParams = new URLSearchParams(searchParams);
+    updatedSearchParams.set("minPrice", minPrice);
+    updatedSearchParams.set("maxPrice", maxPrice);
+    updatedSearchParams.set("page", 0); // Reset page về 0 khi thay đổi giá
+    navigate(`/search?${updatedSearchParams.toString()}`);
   }, 300);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    const updatedSearchParams = new URLSearchParams(searchParams);
+    updatedSearchParams.set("page", page);
+    navigate(`/search?${updatedSearchParams.toString()}`);
   };
 
   const handleGoBack = () => {
     navigate("/home");
   };
 
+  // Biến đổi danh mục thành dạng tree cho TreeSelect
+  const transformCategoriesToTree = (categories) => {
+    return categories.map((category) => ({
+      title: category.name,
+      value: category.id,
+      selectable: !category.children || category.children.length === 0, // chỉ cho phép chọn danh mục con
+      children: category.children
+        ? transformCategoriesToTree(category.children)
+        : [],
+    }));
+  };
+
   return (
     <div className="container mx-auto p-4 flex">
+      {/* Bộ lọc */}
       <div className="w-1/4 pl-4 bg-white p-4 rounded-lg shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Bộ lọc</h2>
 
-        <select
-          name="categoryId"
-          onChange={handleFilterChange}
+        {/* Bộ lọc danh mục */}
+        {/* <TreeSelect
+          placeholder="Tất cả danh mục"
+          className="w-full mb-4"
           value={filters.categoryId}
-          className="w-full mb-4 p-2 border rounded-md"
-        >
-          <option value="">Tất cả danh mục</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+          defaultValue={filters.categoryId}
+          onChange={(value) => handleFilterChange("categoryId", value)}
+          treeData={transformCategoriesToTree(categories)} // Dữ liệu danh mục dạng cây
+          treeDefaultExpandAll
+          showSearch
+          filterTreeNode={(inputValue, treeNode) =>
+            treeNode.title.toLowerCase().includes(inputValue.toLowerCase())
+          }
+          treeNodeFilterProp="title"
+        /> */}
 
-        {/* Dropdown tỉnh/thành phố */}
-        <select
-          name="province"
-          onChange={handleFilterChange}
+        {/* Bộ lọc tỉnh/thành phố */}
+        <Select
+          placeholder="Tất cả tỉnh/thành phố"
+          className="w-full mb-4"
           value={filters.province}
-          className="w-full mb-4 p-2 border rounded-md"
+          onChange={(value) => handleFilterChange("province", value)}
+          showSearch
+          filterOption={(input, option) =>
+            option.children.toLowerCase().includes(input.toLowerCase())
+          }
+          defaultValue={filters.province}
         >
-          <option value="">Tất cả tỉnh/thành phố</option>
+          <Select.Option value="">Tất cả tỉnh/thành phố</Select.Option>
           {Object.keys(provincesData).map((province) => (
-            <option key={province} value={province}>
+            <Select.Option key={province} value={province}>
               {provincesData[province].name}
-            </option>
+            </Select.Option>
           ))}
-        </select>
+        </Select>
 
+        {/* Bộ lọc giá */}
         <div className="mb-4">
-          <label className="block mb-2">
-            Giá tối thiểu: {filters.minPrice.toLocaleString()} VNĐ
-          </label>
-          <input
-            type="range"
-            name="minPrice"
-            min="0"
-            max="1000000"
-            step="10000"
-            value={filters.minPrice}
+          <label className="block mb-2">Khoảng giá (VNĐ):</label>
+          <Slider
+            range
+            min={0}
+            max={1000000}
+            step={10000}
+            value={[filters.minPrice, filters.maxPrice]}
             onChange={handlePriceChange}
-            className="w-full"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-2">
-            Giá tối đa: {filters.maxPrice.toLocaleString()} VNĐ
-          </label>
-          <input
-            type="range"
-            name="maxPrice"
-            min="0"
-            max="100000000"
-            step="10000"
-            value={filters.maxPrice}
-            onChange={handlePriceChange}
-            className="w-full"
           />
         </div>
       </div>
 
-      <div className="w-3/4 pr-4 ms-9">
+      {/* Danh sách sản phẩm */}
+      <div className="w-3/4 pr-4">
         <h1 className="text-2xl font-bold mb-4">
           Kết quả tìm kiếm cho "{query}"
         </h1>
@@ -168,17 +182,14 @@ function SearchResultsPage() {
           <>
             <ProductList products={products} />
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
+              current={currentPage + 1} // Ant Design Pagination starts at 1
+              total={totalPages * 10} // Tính toán tổng số bản ghi
+              onChange={(page) => handlePageChange(page - 1)} // Convert back to 0-indexed
             />
             <div className="flex justify-center mb-4 mt-9">
-              <button
-                onClick={handleGoBack}
-                className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
-              >
+              <Button onClick={handleGoBack} className="bg-gray-300">
                 Trở lại
-              </button>
+              </Button>
             </div>
           </>
         )}

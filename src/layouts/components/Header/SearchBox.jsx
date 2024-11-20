@@ -1,10 +1,11 @@
 // src/components/SearchBox.jsx
 import React, { useState, useRef } from "react";
 import { FaSearch, FaTimes } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function SearchBox({ className }) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("q"));
   const inputRef = useRef(null);
   const navigate = useNavigate();
 

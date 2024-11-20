@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import ProductList from "./product/components/ProductList";
-import Pagination from "./product/components/Pagination";
-import poster from "../assets/images/poster.png";
-import Footer from "./product/components/Footer";
+import { Spin, Pagination, Row, Col, Typography } from "antd";
+import ProductList from "./ProductList";
+import Footer from "./Footer";
 import ProductService from "@services/product.service";
+import poster from "@assets/images/poster.png";
+import ".scss";
+
+const { Title, Paragraph } = Typography;
 
 function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(9);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 8;
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const page = parseInt(searchParams.get("page") || "0", 10);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const size = parseInt(searchParams.get("size") || "9", 10);
     setCurrentPage(page);
+    setPageSize(size);
   }, [searchParams]);
 
   useEffect(() => {
@@ -41,55 +46,57 @@ function Home() {
     }
   }
 
-  const handleChangePage = (newPage) => {
-    navigate(`?page=${newPage}`);
+  const handleChangePage = (page) => {
+    navigate(`?page=${page}`);
   };
 
   return (
-    <div>
+    <div className="home-container">
       {/* Poster Image */}
-      <div className="container mx-auto mt-4">
-        <img
-          src={poster}
-          alt="Poster"
-          className="w-full h-64 object-cover rounded-lg shadow-lg"
-        />
+      <div className="poster-container">
+        <img src={poster} alt="Poster" className="poster" />
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Tin đăng dành cho bạn</h1>
+      <div className="main-content">
+        <Title level={2} className="section-title">
+          Tin đăng dành cho bạn
+        </Title>
 
         {loading ? (
-          <p>Đang tải sản phẩm...</p>
+          <div className="loading-container">
+            <Spin size="large" />
+          </div>
         ) : (
           <>
             <ProductList products={products} />
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) => handleChangePage(page)}
+              className="pagination"
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalPages * pageSize}
+              onChange={handleChangePage}
             />
           </>
         )}
 
-        {/* Thông tin giới thiệu ở cuối trang */}
-        <div className="mt-8 bg-gray-100 p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-xl font-semibold mb-4">Secondhand Market</h2>
-          <p className="text-gray-700 mb-4">
+        {/* Introduction Section */}
+        <div className="intro-section">
+          <Title level={3}>Secondhand Market</Title>
+          <Paragraph>
             Secondhand Market là một nền tảng mua sắm trực tuyến tập trung vào
             việc mua bán các sản phẩm đã qua sử dụng, hướng đến phong cách sống
             bền vững và tiết kiệm.
-          </p>
-          <p className="text-gray-700 mb-4">
+          </Paragraph>
+          <Paragraph>
             Ngoài việc giúp bạn tiết kiệm chi phí, Secondhand Market còn hướng
             tới bảo vệ môi trường bằng cách giảm lượng rác thải thông qua việc
             tái sử dụng sản phẩm.
-          </p>
-          <p className="text-gray-700">
+          </Paragraph>
+          <Paragraph>
             Hãy tham gia cộng đồng Secondhand Market để tìm kiếm và trao đổi
             những món đồ yêu thích!
-          </p>
+          </Paragraph>
         </div>
       </div>
 
