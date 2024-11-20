@@ -7,6 +7,8 @@ import { PlusOutlined } from "@ant-design/icons";
 import uploadService from "@services/upload.service";
 import ReviewService from "@services/review.service";
 import Loading from "@components/Loading";
+import { useSelector } from "react-redux";
+import ModalFeedback from "./ModalFeedback";
 
 const ModalPostReview = ({ review, setReviews }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,11 +16,32 @@ const ModalPostReview = ({ review, setReviews }) => {
   const [comment, setComment] = useState("");
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const currentUserId = useSelector((state) => state.auth.user.id);
+  const isReviewer = currentUserId === review?.reviewer?.id;
+  const isPending = review?.status === "PENDING";
+
+  let buttonLabel = null;
+  let isDisabled = false;
+
+  if (isReviewer) {
+    if (isPending) {
+      buttonLabel = "Review";
+    } else {
+      buttonLabel = "Rated";
+      isDisabled = true;
+    }
+  } else if (!isReviewer) {
+    if (isPending) {
+      buttonLabel = "null";
+      isDisabled = true;
+    } else {
+      buttonLabel = "Feedback";
+    }
+  }
 
   const showModal = () => {
     setIsModalOpen(true);
   };
-  console.log({ review });
 
   const handleOk = async () => {
     setIsLoading(true);
@@ -46,8 +69,7 @@ const ModalPostReview = ({ review, setReviews }) => {
       data.image = result?.data;
     }
 
-    console.log({ review: review.id });
-    console.log({ data });
+    console.log({ review });
     const [res, err] = await ReviewService.postReview(review.id, data);
     setIsLoading(false);
     if (err) {
@@ -106,6 +128,7 @@ const ModalPostReview = ({ review, setReviews }) => {
     }
     return isImage && isSizeValid; // Chỉ chấp nhận file hợp lệ
   };
+  console.log({ review, currentUserId });
 
   const uploadButton = (
     <div>
@@ -116,19 +139,23 @@ const ModalPostReview = ({ review, setReviews }) => {
 
   return (
     <Loading isLoading={isLoading}>
-      <Button
-        type="primary"
-        onClick={showModal}
-        disabled={review.status === "PUBLIC"}
-      >
-        <TfiCommentsSmiley />
-        Review
-      </Button>
+      {buttonLabel === "Feedback" ? (
+        <ModalFeedback review={review} />
+      ) : buttonLabel === "Review" ? (
+        <Button type="primary" onClick={showModal} disabled={isDisabled}>
+          <TfiCommentsSmiley />
+        </Button>
+      ) : (
+        <Button disabled={true}>{buttonLabel}</Button>
+      )}
+
       <Modal
         title="Nhận xét sản phẩm"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
+        cancelButtonProps={{ disabled: isLoading }}
+        okButtonProps={{ disabled: isLoading }}
       >
         <div className="mb-3">
           <p>Đánh giá</p>

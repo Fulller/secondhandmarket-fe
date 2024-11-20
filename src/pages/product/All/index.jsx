@@ -56,6 +56,7 @@ const AllProduct = () => {
 
   async function fetchProducts() {
     const [res, err] = await ProductService.sellerGetAllProduct();
+    console.log({ res, err });
     if (err) {
       message.error("Lấy sản phẩm thất bại");
     } else {
@@ -139,7 +140,7 @@ const AllProduct = () => {
     if (status === "ALL") {
       return products;
     }
-    return products.filter((product) => product.status === status);
+    return products?.filter((product) => product.status === status);
   };
 
   const tabItems = Object.keys(statusMap).map((STATUS) => ({
