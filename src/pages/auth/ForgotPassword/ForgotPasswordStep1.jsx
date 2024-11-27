@@ -14,7 +14,6 @@ const ForgotPasswordStep1 = ({ onNext }) => {
   const handleSubmit = async ({ email }) => {
     const [result, error] = await AuthService.forgotPassword(email);
     if (error) {
-      console.log({ error });
       setErrorMessage(getMessage(error.code));
       toast.error(getMessage(error.code), {
         autoClose: 3000,

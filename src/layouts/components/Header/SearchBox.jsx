@@ -1,24 +1,27 @@
-// src/components/SearchBox.jsx
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { FaSearch, FaTimes } from "react-icons/fa";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { selectFilters, setNewQuery } from "@redux/slices/search.slice";
+import { useDispatch, useSelector } from "react-redux";
 
-export default function SearchBox({ className }) {
-  const [searchParams] = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("q"));
-  const inputRef = useRef(null);
+const SearchBox = ({ className = "" }) => {
+  const { q } = useSelector(selectFilters);
+  const [query, setQuery] = useState(q);
+  const location = useLocation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+    if (location.pathname != "/search") {
+      navigate("/search");
     }
+    dispatch(setNewQuery(query));
   };
 
   const handleClear = () => {
-    setSearchTerm("");
-    inputRef.current.focus();
+    setQuery("");
   };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
@@ -26,29 +29,36 @@ export default function SearchBox({ className }) {
   };
 
   return (
-    <div className={className + " flex-1 flex items-center mx-8"}>
+    <div className={`${className} flex-1 flex items-center mx-8`}>
       <div className="flex items-center w-full bg-gray-100 rounded-md p-1 pl-4">
         <input
           type="text"
           onKeyDown={handleKeyDown}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           className="flex-1 bg-transparent focus:outline-none py-1"
           placeholder="Tìm kiếm sản phẩm..."
-          ref={inputRef}
+          aria-label="Search"
         />
-        {searchTerm && (
-          <button onClick={handleClear} className="text-gray-500 p-2">
+        {query && (
+          <button
+            onClick={handleClear}
+            className="text-gray-500 p-2 hover:text-gray-700 focus:outline-none"
+            aria-label="Clear search"
+          >
             <FaTimes />
           </button>
         )}
         <button
           onClick={handleSearch}
-          className="bg-blue-500 text-white p-2 px-4 rounded-md hover:bg-blue-600"
+          className="bg-blue-500 text-white p-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+          aria-label="Submit search"
         >
           <FaSearch />
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default SearchBox;

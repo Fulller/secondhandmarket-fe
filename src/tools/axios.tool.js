@@ -1,11 +1,11 @@
 import axios from "axios";
-import env from "@configs/env.config";
+import { SERVER_URL } from "@configs/const.config";
 import store from "@redux/store.redux";
 
 import _ from "lodash";
 
 const axiosInstance = axios.create({
-  baseURL: env.api_url,
+  baseURL: SERVER_URL.API,
   headers: {
     "Content-Type": "application/json",
   },

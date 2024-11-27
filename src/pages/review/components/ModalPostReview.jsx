@@ -30,7 +30,7 @@ const ModalPostReview = ({ review, setReviews }) => {
       buttonLabel = "Rated";
       isDisabled = true;
     }
-  } else  {
+  } else {
     if (isPending) {
       buttonLabel = "null";
       isDisabled = true;
@@ -69,7 +69,6 @@ const ModalPostReview = ({ review, setReviews }) => {
       data.image = result?.data;
     }
 
-    console.log({ review });
     const [res, err] = await ReviewService.postReview(review.id, data);
     setIsLoading(false);
     if (err) {
@@ -83,12 +82,6 @@ const ModalPostReview = ({ review, setReviews }) => {
           ...prevReviews,
           { ...res.data, status: "PUBLIC" },
         ];
-
-        console.log({
-          updatedReviews: updatedReviews.filter(
-            (review) => review.status !== "PUBLIC"
-          ),
-        });
       });
       resetForm();
     }
@@ -128,7 +121,6 @@ const ModalPostReview = ({ review, setReviews }) => {
     }
     return isImage && isSizeValid; // Chỉ chấp nhận file hợp lệ
   };
-  console.log({ review, currentUserId });
 
   const uploadButton = (
     <div>

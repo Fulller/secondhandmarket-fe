@@ -20,6 +20,7 @@ import UserChangePassword from "@pages/user/ChangePassword";
 import ProductAll from "@pages/product/All";
 import SellerProduct from "@pages/product/SellerProduct";
 import ProductDetail from "@pages/product/Detail";
+import Search from "@pages/product/Search";
 // Purchase request
 import PurchaseRequestMy from "@pages/purchaseRequest/My";
 import PurchaseRequestToMe from "@pages/purchaseRequest/ToMe";
@@ -31,8 +32,6 @@ import ReviewForMe from "@pages/review/ForMe";
 import ReviewFromMe from "@pages/review/FromMe";
 // Seller
 import Seller from "@pages/Seller";
-//search
-import SearchResultsPage from "@pages/product/Search/SearchResultsPage";
 
 const ROUTE_TYPES = {
   PUBLIC: PublicRoute,
@@ -136,7 +135,7 @@ const routes = [
   },
   {
     path: "/search",
-    Page: SearchResultsPage,
+    Page: Search,
     Layout: MainLayout,
     type: ROUTE_TYPES.PUBLIC,
     title: "Kết quả tìm kiếm",

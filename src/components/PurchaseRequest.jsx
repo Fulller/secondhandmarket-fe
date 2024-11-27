@@ -83,7 +83,6 @@ const PurchaseRequest = ({ isBuyer }) => {
       dataSource={data}
       renderItem={(request) => {
         const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
-        console.log({ request });
         return (
           <List.Item>
             <Card>

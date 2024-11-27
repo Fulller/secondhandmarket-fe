@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Spin, Pagination, Row, Col, Typography } from "antd";
-import ProductList from "./ProductList";
+import { Spin, Typography } from "antd";
+import Pagination from "@components/Pagination";
+import ProductList from "../product/components/ProductList";
 import Footer from "./Footer";
 import ProductService from "@services/product.service";
 import poster from "@assets/images/poster.png";
@@ -37,7 +38,6 @@ function Home() {
       pageSize
     );
     setLoading(false);
-    console.log({ res, err });
     if (err) {
       console.error("Không thể tải danh sách sản phẩm:", err);
     } else {
@@ -82,7 +82,7 @@ function Home() {
 
         {/* Introduction Section */}
         <div className="intro-section">
-          <Title level={3}>Secondhand Market</Title>
+          <Title level={3}>CHỢ CŨ</Title>
           <Paragraph>
             Secondhand Market là một nền tảng mua sắm trực tuyến tập trung vào
             việc mua bán các sản phẩm đã qua sử dụng, hướng đến phong cách sống

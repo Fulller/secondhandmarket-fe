@@ -45,7 +45,6 @@ const TabOrderForSeller = () => {
         OrderService.getOrderSeller(statusOrder),
         ReviewService.getSellerReview(),
       ]);
-    console.log({ ordersErr, reviewsErr });
     if (ordersErr || reviewsErr) {
       message.error("Lấy order seller thất bại");
       setIsLoading(false);

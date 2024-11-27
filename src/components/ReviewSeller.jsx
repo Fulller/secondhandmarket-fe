@@ -25,7 +25,6 @@ const ReviewSeller = () => {
   }, []);
 
   async function handleGetReviewsSeller() {
-    console.log(id);
     setIsLoading(true);
     const [res, err] = await ReviewService.getShopReview(id, "PUBLIC");
     setIsLoading(false);

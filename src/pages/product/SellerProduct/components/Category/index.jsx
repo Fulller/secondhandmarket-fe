@@ -16,7 +16,6 @@ function CategorySelector() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log({categoryTree});
 
   useEffect(() => {
     fetchCategoryTree();

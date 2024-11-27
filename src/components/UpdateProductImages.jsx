@@ -26,7 +26,6 @@ const UploadProductImages = ({ onChange: handChange, data }) => {
     Promise.all(imageUrls)
       .then((files) => {
         setImages(files);
-        console.log({ files });
         handChange(fileArray); // Gửi images sau khi cập nhật
       })
       .catch((error) => {

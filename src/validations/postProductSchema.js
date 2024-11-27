@@ -68,5 +68,4 @@ const createDynamicSchema = (attributes) => {
   return schema.append(dynamicFields);
 };
 
-console.log({ createDynamicSchema });
 export default createDynamicSchema;

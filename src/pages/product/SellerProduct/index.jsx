@@ -37,7 +37,6 @@ function SellerProduct() {
       payload: { isLoading: false },
     });
     if (err) {
-      console.log({ err });
       return;
     }
     dispatch({

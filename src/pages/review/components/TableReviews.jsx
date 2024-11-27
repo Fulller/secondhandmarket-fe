@@ -99,7 +99,6 @@ const TableReviews = ({ reviews, isLoading, status, setReviews }) => {
       dataIndex: "",
       key: "",
       render: (record) => {
-        console.log({ record });
         return record.status === "PENDING" ? (
           <ModalPostReview review={record} setReviews={setReviews} />
         ) : record.status === "PUBLIC" ? (

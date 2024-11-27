@@ -56,7 +56,6 @@ const AllProduct = () => {
 
   async function fetchProducts() {
     const [res, err] = await ProductService.sellerGetAllProduct();
-    console.log({ res, err });
     if (err) {
       message.error("Lấy sản phẩm thất bại");
     } else {
@@ -65,15 +64,12 @@ const AllProduct = () => {
   }
 
   const handleActionClick = async (productId, action) => {
-    console.log({ productId, action });
     const [res, err] = await ProductService.changeStatus(productId, action);
     if (err) {
       message.error("Đổi trạng thái thât bại");
-      console.log({ err });
       return;
     }
     message.info("Đổi trạng thái thành công");
-    console.log({ res });
   };
 
   const ActionButtons = ({ status, productId }) => {

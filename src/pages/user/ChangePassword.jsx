@@ -40,7 +40,7 @@ const ChangePassword = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[url('https://res.cloudinary.com/dt2tfpjrm/image/upload/v1730040121/secondhandmarket/60f1d9f1-d292-4a69-b0c1-35e5d047b42e/images/cwlzkl9hokhapuqlst7e.avif')] bg-cover bg-center min-h-screen flex items-center justify-center">
+    <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
         <HeaderForm>Đổi mật khẩu</HeaderForm>
         <Form onSubmit={handleSubmit} schema={changePasswordSchema}>

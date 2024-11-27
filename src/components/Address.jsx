@@ -4,7 +4,6 @@ import { useState, useContext, useEffect } from "react";
 import { FormContext } from "./Form";
 
 const Address = ({ onChange: handleSumbit, address }) => {
-  console.log({ addressInComponent: address });
   const { handleChange, errors } = useContext(FormContext);
   const data = dataAddress;
   const [selectedProvince, setSelectedProvince] = useState("");
@@ -62,7 +61,6 @@ const Address = ({ onChange: handleSumbit, address }) => {
   };
   const handleAddressSelect = (selectedAddress) => {
     setShowAddress(selectedAddress);
-    console.log({ showAddress });
   };
   return (
     <>

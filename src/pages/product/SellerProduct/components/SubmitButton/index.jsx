@@ -41,7 +41,6 @@ function SubmitButton() {
         filesToUpload.map((file) => file.originFileObj)
       );
       if (uploadError) {
-        console.log({ uploadError });
         message.error("Lỗi upload hình ảnh");
         return;
       }
@@ -118,7 +117,6 @@ function SubmitButton() {
         .value()
     );
     if (err) {
-      console.log({ err });
       message.error("Đăng sản phẩm thất bại");
       return;
     }
@@ -152,7 +150,6 @@ function SubmitButton() {
       .value();
     const [res, err] = await ProductService.updateProduct(id, dataForUpdate);
     if (err) {
-      console.log({ err });
       message.error("Cập nhật phẩm thất bại");
       return;
     }

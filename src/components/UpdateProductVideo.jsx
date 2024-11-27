@@ -11,7 +11,6 @@ const UpdateProductVideo = ({ onChange: handleChange, data }) => {
     setVideoPreviewUrl(data);
     handleChange(video);
   }, [video, handleChange, data]);
-  console.log({ videoPreviewUrl });
 
   const handleVideoFileChange = () => {
     const file = videoFileRef?.current?.files[0];
@@ -20,7 +19,6 @@ const UpdateProductVideo = ({ onChange: handleChange, data }) => {
       reader.onload = () => {
         setVideoPreviewUrl(reader.result); // Lưu URL tạm thời của video
         setVideo(file); // Lưu file video để upload
-        console.log("video component", file);
       };
       reader.readAsDataURL(file); // Đọc video dưới dạng URL
     }

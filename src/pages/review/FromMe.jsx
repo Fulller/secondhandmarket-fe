@@ -34,7 +34,6 @@ function FromMe() {
     const [res, err] = await ReviewService.getReviewerReview(status);
     setIsLoading(false);
     if (err) {
-      console.log("Lấy review thất bại");
     } else {
       setReviews(res.data);
     }

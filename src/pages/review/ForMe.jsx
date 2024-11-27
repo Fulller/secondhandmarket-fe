@@ -35,7 +35,6 @@ function ForMe() {
     const [res, err] = await ReviewService.getSellerReview(status);
     setIsLoading(false);
     if (err) {
-      console.log("Lấy review thất bại");
     } else {
       setReviews(res.data);
     }

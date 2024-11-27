@@ -10,7 +10,6 @@ const UploadVideo = ({ onChange: handleChange }) => {
   useEffect(() => {
     handleChange(video);
   }, [video, handleChange]);
-  console.log({ videoPreviewUrl });
 
   const handleVideoFileChange = () => {
     const file = videoFileRef?.current?.files[0];
@@ -19,7 +18,6 @@ const UploadVideo = ({ onChange: handleChange }) => {
       reader.onload = () => {
         setVideoPreviewUrl(reader.result); // Lưu URL tạm thời của video
         setVideo(file); // Lưu file video để upload
-        console.log("video component", file);
       };
       reader.readAsDataURL(file); // Đọc video dưới dạng URL
     }
