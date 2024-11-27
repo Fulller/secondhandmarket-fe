@@ -1,0 +1,115 @@
+/* ProductList.scss */
+
+.product-list {
+    display              : grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap                  : 16px;
+    margin-top           : 16px;
+    justify-items        : center;
+    /* Căn giữa các thẻ sản phẩm */
+
+    @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.product-card {
+    position     : relative;
+    border-radius: 8px;
+    overflow     : hidden;
+    box-shadow   : 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition   : transform 0.3s ease, box-shadow 0.3s ease;
+    max-width    : 350px;
+    /* Giới hạn chiều ngang sản phẩm */
+    width        : 100%;
+    /* Chiếm toàn bộ không gian nếu không có max-width */
+
+    &:hover {
+        transform : translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.product-image {
+    width          : 100%;
+    height         : 220px;
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    overflow       : hidden;
+    position       : relative;
+
+    .img-fluid {
+        width     : 100%;
+        height    : 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    &:hover .img-fluid {
+        transform: scale(1.05);
+    }
+}
+
+.product-info {
+    padding: 16px;
+}
+
+.product-title {
+    font-weight  : bold;
+    font-size    : 16px;
+    margin-bottom: 8px;
+}
+
+.product-price {
+    color      : red;
+    font-weight: bold;
+    font-size  : 18px;
+}
+
+.seller-info {
+    display    : flex;
+    align-items: center;
+    margin-top : 8px;
+
+    .seller-avatar {
+        width        : 32px;
+        height       : 32px;
+        border-radius: 50%;
+    }
+
+    .seller-name {
+        margin-left: 8px;
+        font-size  : 14px;
+    }
+}
+
+.product-meta {
+    display        : flex;
+    justify-content: space-between;
+    margin-top     : 8px;
+    font-size      : 14px;
+    color          : #666;
+
+    .location {
+        display    : flex;
+        align-items: center;
+
+        .location-icon {
+            font-size   : 18px;
+            margin-right: 4px;
+        }
+    }
+
+    .posted-time {
+        font-size: 14px;
+    }
+}

@@ -1,14 +1,18 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FormContext } from "./index";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 
-const Field = ({ name, label, type = "text", placeholder }) => {
+const Field = ({ name, label, type = "text", placeholder, defaultValue }) => {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const { data, errors, handleChange } = useContext(FormContext);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!isPasswordVisible);
   };
+
+  useEffect(() => {
+    handleChange(name, defaultValue);
+  }, [defaultValue]);
 
   return (
     <div className="mb-4">
@@ -20,8 +24,9 @@ const Field = ({ name, label, type = "text", placeholder }) => {
           type={type === "password" && isPasswordVisible ? "text" : type}
           id={name}
           name={name}
-          value={data[name] || ""}
           placeholder={placeholder}
+          value={data[name] || ""}
+          defaultValue={defaultValue}
           className={`w-full px-3 py-2 border ${
             errors[name] ? "border-red-500" : "border-gray-300"
           } rounded-md focus:outline-none focus:ring-2 ${

@@ -1,5 +1,7 @@
+import TabOrderForBuyer from "./components/TabOrderForBuyer";
+
 function OrderBuy() {
-  return <div>OrderBuy page</div>;
+  return <TabOrderForBuyer />;
 }
 
 export default OrderBuy;

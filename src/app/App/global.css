@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap");
 
 * {
   font-family: "Noto Sans Mono", monospace;
@@ -28,4 +28,9 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555; /* Màu của thanh cuộn khi hover */
+}
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }

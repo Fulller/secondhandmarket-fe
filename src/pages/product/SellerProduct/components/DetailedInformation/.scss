@@ -1,0 +1,16 @@
+#seller-product-detail-information {
+
+    width: 100%;
+
+    .attributes {
+        display              : grid;
+        grid-template-columns: 1fr 1fr;
+        gap                  : 0 24px;
+        width                : 100%;
+
+        .attribute-item {
+            width: 100%;
+        }
+
+    }
+}

@@ -14,7 +14,6 @@ const ForgotPasswordStep1 = ({ onNext }) => {
   const handleSubmit = async ({ email }) => {
     const [result, error] = await AuthService.forgotPassword(email);
     if (error) {
-      console.log({ error });
       setErrorMessage(getMessage(error.code));
       toast.error(getMessage(error.code), {
         autoClose: 3000,
@@ -28,7 +27,7 @@ const ForgotPasswordStep1 = ({ onNext }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen ">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
         <HeaderForm>Quên mật khẩu</HeaderForm>
         <Form onSubmit={handleSubmit} schema={forgotPasswordStep1Schema}>

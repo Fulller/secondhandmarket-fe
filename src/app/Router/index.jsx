@@ -5,11 +5,12 @@ import routes from "@app/Router/routes";
 
 function Router() {
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <Routes>
         {routes.map((route) => {
           const { path, type, element, title } = route;
-          console.log({ title });
           const RouteType = route.type;
           return (
             <Route

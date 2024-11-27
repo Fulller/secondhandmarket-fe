@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AuthService from "@services/auth.service";
-import { setAccessToken, setUser, setIsLogin } from "@redux/slices/auth.slice";
+import {
+  setAccessToken,
+  setUser,
+  setIsLogin,
+  setTokens,
+} from "@redux/slices/auth.slice";
 import env from "@configs/env.config";
 
 const useInitialApp = () => {
@@ -15,6 +20,7 @@ const useInitialApp = () => {
     const [result, error] = await AuthService.refreshToken();
     if (error) {
       dispatch(setIsLogin(false));
+      dispatch(setTokens({ accessToken: "", refreshToken: "" }));
       return;
     }
     const { accessToken } = result.data;
